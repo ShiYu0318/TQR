@@ -126,3 +126,166 @@ def grid_edges(n):
     return src, dst
 
 
+# ----------------------------------------------------------------------------- method: bridge (new)
+def solve_bridge(views, max_add=6, eps=1e-3, verbose=False):
+    """Grow a solid from module cubes only. Feasible cubes (no new error) are free; any other cube is a bridge whose
+    cost is the error it adds (QR: codeword errors against a per-block budget, repeats on the same ray/codeword free;
+    logo: flipped pixels). Function modules are forbidden unless marked benign. When nothing else is reachable
+    (sealed pocket) a new piece is seeded. Returns the cube set and stats; pieces > 1 means sealed pockets remain."""
+    n = views[0].T.shape[0]
+    N3 = n ** 3
+    Vf = feasible_set(views)
+    lab, K = ndimage.label(Vf, structure=S6)
+    req = required(views)
+    xs, ys, zs = np.nonzero(Vf)
+    comp = lab[xs, ys, zs] - 1
+    pix = np.stack([xs * n + ys, n * n + xs * n + zs, 2 * n * n + ys * n + zs], 1)
+    C = sparse.csr_matrix((np.ones(3 * len(comp)), (np.repeat(comp, 3), pix.ravel())), shape=(K, 3 * n * n))
+    C.sum_duplicates(); C.data[:] = 1
+    # orphans: required pixels whose ray holds no feasible cube -> accept as data error if possible
+    orphans = 0
+    cover = project(Vf)
+    for v, r, d in zip(views, req, cover):
+        miss = r & ~d
+        if v.kind == "qr":
+            v.accepted |= miss & (v.cw >= 0)
+        orphans += int(miss.sum())
+    cover = [c.copy() for c in cover]
+    src, dst = grid_edges(n)
+    M = np.zeros((n, n, n), bool)
+    bridges, seeds, it = 0, 0, 0
+    while True:
+        it += 1
+        dark = project(M)
+        unc_maps = [r & ~d & ~(v.accepted if v.kind == "qr" else False) for v, r, d in zip(views, req, dark)]
+        unc = np.concatenate([u.ravel() for u in unc_maps]).astype(float)
+        if unc.sum() == 0:
+            break
+        gain = C @ unc
+        inM = ndimage.maximum(M, lab, index=np.arange(1, K + 1)).astype(bool) if M.any() else np.zeros(K, bool)
+        options = []
+        if M.any():
+            sts = [v.state(d) for v, d in zip(views, dark)]
+            costs = [v.pixel_cost(d, s) for v, d, s in zip(views, dark, sts)]
+            cc = cell_cost(costs).ravel()
+            cc[M.ravel()] = 0.0
+            w = np.where(cc[dst] >= INF, INF, cc[dst] + eps)
+            G = sparse.csr_matrix((w, (src, dst)), shape=(N3, N3))
+            dist, pred, _ = dijkstra(G, directed=True, indices=np.flatnonzero(M.ravel()),
+                                     return_predecessors=True, min_only=True)
+            dist3 = dist.reshape(n, n, n)
+            reach = ndimage.minimum(dist3, lab, index=np.arange(1, K + 1))
+            cand = np.flatnonzero((gain > 0) & ~inM & (reach < INF / 10))
+            options = sorted((reach[k] / gain[k], k) for k in cand)
+            # orphan pixels (no feasible cube on the ray): reach the cheapest cell on the ray
+            for vi, um in enumerate(unc_maps):
+                for p in np.argwhere(um & ~cover[vi]):
+                    ray = dist3[p[0], p[1], :] if vi == 0 else (dist3[p[0], :, p[1]] if vi == 1 else dist3[:, p[0], p[1]])
+                    j = int(np.argmin(ray))
+                    if ray[j] < INF / 10:
+                        cell = (p[0], p[1], j) if vi == 0 else ((p[0], j, p[1]) if vi == 1 else (j, p[0], p[1]))
+                        options.append((float(ray[j]), ("cell", cell)))
+            options.sort(key=lambda t: t[0])
+        if not options:
+            # sealed pocket (or first step): seed the most useful unreached component as a new piece
+            k = int(np.argmax(np.where(inM, -1, gain)))
+            if gain[k] <= 0:
+                break
+            M |= (lab == k + 1)
+            seeds += 1
+            continue
+        first = options[0][0]
+        n_added = 0
+        for score, k in options:
+            if n_added >= max_add or score > 2.5 * first + 1e-9:
+                break
+            if isinstance(k, tuple):
+                ti = int(np.ravel_multi_index(k[1], (n, n, n)))
+            else:
+                cells = np.argwhere(lab == k + 1)
+                dd = dist3[cells[:, 0], cells[:, 1], cells[:, 2]]
+                ti = int(np.ravel_multi_index(tuple(cells[np.argmin(dd)]), (n, n, n)))
+            path = []
+            Mf = M.ravel()
+            while ti >= 0 and not Mf[ti]:
+                path.append(ti); ti = int(pred[ti])
+            if n_added:   # stale-cost guard
+                dark = project(M)
+                sts = [v.state(d) for v, d in zip(views, dark)]
+                costs = [v.pixel_cost(d, s) for v, d, s in zip(views, dark, sts)]
+                ok = True
+                for i in path:
+                    x, y, z = np.unravel_index(i, (n, n, n))
+                    if costs[0][x, y] + costs[1][x, z] + costs[2][y, z] >= INF:
+                        ok = False; break
+                if not ok:
+                    continue
+            bridges += sum(1 for i in path if not Vf.ravel()[i])
+            Mf[path] = True
+            M = Mf.reshape(n, n, n)
+            if not isinstance(k, tuple):
+                M |= (lab == k + 1)
+            n_added += 1
+        if n_added == 0:
+            k = options[0][1]
+            if isinstance(k, tuple):
+                break
+            M |= (lab == k + 1); seeds += 1
+    pieces, share = components(M)
+    if verbose:
+        print(f"  bridge: cubes={int(M.sum())} bridges={bridges} pieces={pieces} (main {share:.1%}) seeds={seeds} iters={it} orphans={orphans}")
+    return M, {"bridges": bridges, "pieces": pieces, "main_share": share, "seeds": seeds, "orphans": orphans}
+
+
+def connect_pieces(V, views, k=5.0):
+    """Mehlhorn Steiner tree on the module-corner lattice joining all pieces of V with thin struts."""
+    n = V.shape[0]
+    lab, K = ndimage.label(V, structure=S6)
+    if K <= 1:
+        return np.zeros((0, 2), int)
+    wZ, wY, wX = [(~v.T).astype(float) if v.kind != "wall" else np.zeros_like(v.T, float) for v in views]
+    idx = np.arange(n ** 3).reshape(n, n, n)
+    X, Y, Z = np.meshgrid(np.arange(n), np.arange(n), np.arange(n), indexing="ij")
+    A, B, W = [], [], []
+    for ax in range(3):
+        sl = [slice(None)] * 3; sl[ax] = slice(0, n - 1); sl = tuple(sl)
+        a = idx[sl].ravel(); x, y, z = X[sl].ravel(), Y[sl].ravel(), Z[sl].ravel()
+        if ax == 0:   w = k * wZ[x, y] + k * wY[x, z] + wX[y, z]
+        elif ax == 1: w = k * wZ[x, y] + wY[x, z] + k * wX[y, z]
+        else:         w = wZ[x, y] + k * wY[x, z] + k * wX[y, z]
+        A.append(a); B.append(a + (n * n if ax == 0 else (n if ax == 1 else 1))); W.append(w + 0.05)
+    a, b, w = np.concatenate(A), np.concatenate(B), np.concatenate(W)
+    # corners inside a piece are free to join
+    inside = V.ravel()
+    w = np.where(inside[a] & inside[b] & (lab.ravel()[a] == lab.ravel()[b]), 1e-6, w)
+    N3 = n ** 3
+    G = sparse.csr_matrix((np.concatenate([w, w]), (np.concatenate([a, b]), np.concatenate([b, a]))), shape=(N3, N3))
+    terms = np.array([int(idx[tuple(np.argwhere(lab == c + 1)[0])]) for c in range(K)])
+    dist, pred, srcs = dijkstra(G, directed=False, indices=terms, return_predecessors=True, min_only=True)
+    tid = {int(t): i for i, t in enumerate(terms)}
+    su, sv = srcs[a], srcs[b]
+    cross = (su != sv) & (su >= 0) & (sv >= 0)
+    cwt = dist[a][cross] + w[cross] + dist[b][cross]
+    pa = np.array([tid[int(s)] for s in su[cross]]); pb = np.array([tid[int(s)] for s in sv[cross]])
+    lo, hi = np.minimum(pa, pb), np.maximum(pa, pb)
+    key = lo * K + hi
+    order = np.lexsort((cwt, key))
+    first = np.r_[True, key[order][1:] != key[order][:-1]]
+    sel = order[first]
+    T = sparse.csr_matrix((cwt[sel], (lo[sel], hi[sel])), shape=(K, K))
+    mst = minimum_spanning_tree(T).tocoo()
+    look = {(int(p), int(q)): j for j, p, q in zip(sel, lo[sel], hi[sel])}
+    crossidx = np.flatnonzero(cross)
+    edges = set()
+    for p, q in zip(mst.row, mst.col):
+        j = crossidx[look[(int(min(p, q)), int(max(p, q)))]]
+        u, v = int(a[j]), int(b[j])
+        edges.add((min(u, v), max(u, v)))
+        for s in (u, v):
+            while pred[s] >= 0:
+                t = int(pred[s]); edges.add((min(s, t), max(s, t))); s = t
+    # drop strut edges whose both ends sit inside the same piece (they add nothing)
+    out = [(u, v) for u, v in edges if not (inside[u] and inside[v] and lab.ravel()[u] == lab.ravel()[v])]
+    return np.array(sorted(out)) if out else np.zeros((0, 2), int)
+
+
