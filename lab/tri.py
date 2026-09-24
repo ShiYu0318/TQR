@@ -442,3 +442,50 @@ def strut_fine(V, E, k=5):
     return F
 
 
+# ----------------------------------------------------------------------------- evaluation
+def within_budget(V, views):
+    """Stricter than the certificate: QR errors must stay inside the safety budget, not just the RS capacity."""
+    for v, d in zip(views, project(V)):
+        if v.kind == "qr":
+            c = certificate(d, v.T, v.S)
+            if c["func_errors"] or (c["block_errors"] > v.budget).any():
+                return False
+        elif v.kind == "logo":
+            if int((d & ~v.T).sum()) > v.logo_budget:
+                return False
+    return True
+
+
+def third_missing(V, views):
+    return sum(int((~d & v.T).sum()) if v.kind == "logo" else int((~d).sum())
+               for v, d in zip(views, project(V)) if v.kind != "qr")
+
+
+def third_ok(V, views, before):
+    return third_missing(V, views) <= before
+
+
+def evaluate_views(V, views):
+    out = []
+    for v, d in zip(views, project(V)):
+        if v.kind == "qr":
+            c = certificate(d, v.T, v.S)
+            c["budget"] = v.budget
+            out.append(c)
+        elif v.kind == "logo":
+            wrong = d != v.T
+            out.append({"ok": int((d & ~v.T).sum()) <= v.logo_budget and int((~d & v.T).sum()) == 0,
+                        "flips": int((d & ~v.T).sum()), "missing": int((~d & v.T).sum()), "pixel_err": float(wrong.mean())})
+        else:
+            out.append({"ok": bool(d.all()), "missing": int((~d).sum())})
+    return out
+
+
+def components(V):
+    lab, K = ndimage.label(V, structure=S6)
+    if K == 0:
+        return 0, 0.0
+    s = ndimage.sum(V, lab, range(1, K + 1))
+    return K, float(s.max() / V.sum())
+
+
