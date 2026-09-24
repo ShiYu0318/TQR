@@ -1,0 +1,586 @@
+[
+ {
+  "mode": "3qr",
+  "method": "dust",
+  "n": 29,
+  "version": 3,
+  "cubes": 3494,
+  "struts": 0,
+  "pieces_cubes_only": 1065,
+  "main_share": 0.019,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.09090909090909091,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": null,
+  "time_s": 0.0,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 584,
+  "struts": 1828,
+  "pieces_cubes_only": 463,
+  "main_share": 0.009,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.09090909090909091,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": null,
+  "time_s": 0.11,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "bridge",
+  "n": 29,
+  "version": 3,
+  "cubes": 1456,
+  "struts": 0,
+  "pieces_cubes_only": 123,
+  "main_share": 0.43,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": 161,
+  "time_s": 1.71,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "bridge+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 1456,
+  "struts": 627,
+  "pieces_cubes_only": 123,
+  "main_share": 0.43,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": 161,
+  "time_s": 1.89,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "bridge_relaxed",
+  "n": 29,
+  "version": 3,
+  "cubes": 2087,
+  "struts": 0,
+  "pieces_cubes_only": 64,
+  "main_share": 0.863,
+  "one_piece": false,
+  "certified": false,
+  "func_damage": 74,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": 452,
+  "time_s": 1.43,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "bridge_relaxed+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 2087,
+  "struts": 323,
+  "pieces_cubes_only": 64,
+  "main_share": 0.863,
+  "one_piece": true,
+  "certified": false,
+  "func_damage": 74,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": 452,
+  "time_s": 1.37,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "free_greedy",
+  "n": 29,
+  "version": 3,
+  "cubes": 460,
+  "struts": 0,
+  "pieces_cubes_only": 449,
+  "main_share": 0.004,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": null,
+  "time_s": 0.16,
+  "decode_all": true
+ },
+ {
+  "mode": "3qr",
+  "method": "free_milp",
+  "n": 29,
+  "version": 3,
+  "cubes": 479,
+  "struts": 0,
+  "pieces_cubes_only": 456,
+  "main_share": 0.004,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true,
+   true
+  ],
+  "third_view": null,
+  "bridges": null,
+  "time_s": 60.25,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "dust",
+  "n": 29,
+  "version": 3,
+  "cubes": 6245,
+  "struts": 0,
+  "pieces_cubes_only": 768,
+  "main_share": 0.023,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.0,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 6
+  },
+  "bridges": null,
+  "time_s": 0.0,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 916,
+  "struts": 1943,
+  "pieces_cubes_only": 563,
+  "main_share": 0.019,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.0,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 6
+  },
+  "bridges": null,
+  "time_s": 0.11,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "bridge",
+  "n": 29,
+  "version": 3,
+  "cubes": 3239,
+  "struts": 0,
+  "pieces_cubes_only": 68,
+  "main_share": 0.637,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 1
+  },
+  "bridges": 157,
+  "time_s": 1.13,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "bridge+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 3239,
+  "struts": 264,
+  "pieces_cubes_only": 68,
+  "main_share": 0.637,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 1
+  },
+  "bridges": 157,
+  "time_s": 1.26,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "bridge_relaxed",
+  "n": 29,
+  "version": 3,
+  "cubes": 3993,
+  "struts": 0,
+  "pieces_cubes_only": 40,
+  "main_share": 0.942,
+  "one_piece": false,
+  "certified": false,
+  "func_damage": 33,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 0
+  },
+  "bridges": 251,
+  "time_s": 0.95,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "bridge_relaxed+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 3993,
+  "struts": 120,
+  "pieces_cubes_only": 40,
+  "main_share": 0.942,
+  "one_piece": true,
+  "certified": false,
+  "func_damage": 33,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 0
+  },
+  "bridges": 251,
+  "time_s": 1.02,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "free_greedy",
+  "n": 29,
+  "version": 3,
+  "cubes": 835,
+  "struts": 0,
+  "pieces_cubes_only": 720,
+  "main_share": 0.007,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.09090909090909091,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 6
+  },
+  "bridges": null,
+  "time_s": 0.42,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_wall",
+  "method": "free_milp",
+  "n": 29,
+  "version": 3,
+  "cubes": 835,
+  "struts": 0,
+  "pieces_cubes_only": 719,
+  "main_share": 0.006,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.0,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "missing": 6
+  },
+  "bridges": null,
+  "time_s": 0.21,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "dust",
+  "n": 29,
+  "version": 3,
+  "cubes": 2872,
+  "struts": 0,
+  "pieces_cubes_only": 438,
+  "main_share": 0.041,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.18181818181818182,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 0,
+   "missing": 3,
+   "pixel_err": 0.0035671819262782403
+  },
+  "bridges": null,
+  "time_s": 0.0,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 660,
+  "struts": 1185,
+  "pieces_cubes_only": 395,
+  "main_share": 0.029,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.18181818181818182,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 0,
+   "missing": 3,
+   "pixel_err": 0.0035671819262782403
+  },
+  "bridges": null,
+  "time_s": 0.08,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "bridge",
+  "n": 29,
+  "version": 3,
+  "cubes": 1704,
+  "struts": 0,
+  "pieces_cubes_only": 88,
+  "main_share": 0.409,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 52,
+   "missing": 0,
+   "pixel_err": 0.06183115338882283
+  },
+  "bridges": 160,
+  "time_s": 1.34,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "bridge+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 1704,
+  "struts": 299,
+  "pieces_cubes_only": 88,
+  "main_share": 0.409,
+  "one_piece": true,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.5454545454545454,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 52,
+   "missing": 0,
+   "pixel_err": 0.06183115338882283
+  },
+  "bridges": 160,
+  "time_s": 1.37,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "bridge_relaxed",
+  "n": 29,
+  "version": 3,
+  "cubes": 2034,
+  "struts": 0,
+  "pieces_cubes_only": 56,
+  "main_share": 0.838,
+  "one_piece": false,
+  "certified": false,
+  "func_damage": 31,
+  "worst_block_use": 0.6363636363636364,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 38,
+   "missing": 0,
+   "pixel_err": 0.04518430439952437
+  },
+  "bridges": 223,
+  "time_s": 1.12,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "bridge_relaxed+strut",
+  "n": 29,
+  "version": 3,
+  "cubes": 2034,
+  "struts": 156,
+  "pieces_cubes_only": 56,
+  "main_share": 0.838,
+  "one_piece": true,
+  "certified": false,
+  "func_damage": 31,
+  "worst_block_use": 0.6363636363636364,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 38,
+   "missing": 0,
+   "pixel_err": 0.04518430439952437
+  },
+  "bridges": 223,
+  "time_s": 1.15,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "free_greedy",
+  "n": 29,
+  "version": 3,
+  "cubes": 561,
+  "struts": 0,
+  "pieces_cubes_only": 477,
+  "main_share": 0.009,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 0,
+   "missing": 3,
+   "pixel_err": 0.0035671819262782403
+  },
+  "bridges": null,
+  "time_s": 0.21,
+  "decode_all": true
+ },
+ {
+  "mode": "2qr_logo",
+  "method": "free_milp",
+  "n": 29,
+  "version": 3,
+  "cubes": 520,
+  "struts": 0,
+  "pieces_cubes_only": 448,
+  "main_share": 0.012,
+  "one_piece": false,
+  "certified": true,
+  "func_damage": 0,
+  "worst_block_use": 0.45454545454545453,
+  "decoded": [
+   true,
+   true
+  ],
+  "third_view": {
+   "flips": 0,
+   "missing": 3,
+   "pixel_err": 0.0035671819262782403
+  },
+  "bridges": null,
+  "time_s": 0.25,
+  "decode_all": true
+ }
+]
