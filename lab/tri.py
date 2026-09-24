@@ -108,3 +108,21 @@ def required(views):
     return [np.ones_like(v.T) if v.kind == "wall" else v.T for v in views]
 
 
+# ----------------------------------------------------------------------------- grid graph
+_graph_cache = {}
+
+
+def grid_edges(n):
+    if n in _graph_cache:
+        return _graph_cache[n]
+    idx = np.arange(n ** 3).reshape(n, n, n)
+    src, dst = [], []
+    for ax in range(3):
+        a = np.take(idx, range(n - 1), axis=ax).ravel()
+        b = np.take(idx, range(1, n), axis=ax).ravel()
+        src += [a, b]; dst += [b, a]
+    src, dst = np.concatenate(src), np.concatenate(dst)
+    _graph_cache[n] = (src, dst)
+    return src, dst
+
+
