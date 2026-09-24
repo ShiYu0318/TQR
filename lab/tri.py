@@ -489,3 +489,60 @@ def components(V):
     return K, float(s.max() / V.sum())
 
 
+# ----------------------------------------------------------------------------- logos
+def logo(kind, n, text="NCU", badge=True):
+    """Pixel logo for the third view. badge=True draws the icon WHITE inside a dark field: every row and column
+    then keeps dark pixels, which the two QR views need (an all-white logo row makes a whole QR row uncoverable)."""
+    raw = _logo_raw(kind, n, text)
+    if not badge:
+        return raw
+    m = max(1, n // 12)
+    out = ~raw
+    out[:m, :] = out[-m:, :] = out[:, :m] = out[:, -m:] = True
+    return out
+
+
+def _logo_raw(kind, n, text="NCU"):
+    yy, xx = np.mgrid[0:n, 0:n]
+    c = (n - 1) / 2
+    u, v = (xx - c) / (n / 2), (c - yy) / (n / 2)
+    if kind == "heart":
+        u2, v2 = u * 1.25, v * 1.25 + 0.15
+        return (u2 ** 2 + v2 ** 2 - 1) ** 3 - u2 ** 2 * v2 ** 3 <= 0
+    if kind == "star":
+        ang = np.arctan2(v, u); r = np.hypot(u, v)
+        rr = 0.45 + 0.4 * np.abs(np.cos(2.5 * (ang + np.pi / 2)))
+        return r <= rr * 0.95
+    if kind == "ring":
+        r = np.hypot(u, v); return (r <= 0.9) & (r >= 0.55)
+    if kind == "wall":
+        return np.zeros((n, n), bool)
+    if kind == "text":
+        from PIL import Image, ImageDraw, ImageFont
+        big = 8 * n
+        im = Image.new("L", (big, big), 255)
+        dr = ImageDraw.Draw(im)
+        try:
+            f = ImageFont.truetype("DejaVuSans-Bold.ttf", int(big * 0.9 / max(1, len(text)) * 1.5))
+        except Exception:
+            f = ImageFont.load_default()
+        bb = dr.textbbox((0, 0), text, font=f)
+        dr.text(((big - (bb[2] - bb[0])) / 2 - bb[0], (big - (bb[3] - bb[1])) / 2 - bb[1]), text, fill=0, font=f)
+        return np.asarray(im.resize((n, n), Image.BOX)) < 128
+    raise ValueError(kind)
+
+
+def build_views(links, mode="3qr", level="H", budget_frac=0.5, logo_kind="heart", logo_budget=0.1,
+                version=None, masks=(None, None, None), allow_func=(), rots=(0, 0, 0), version_boost=0):
+    qrs = links[:3] if mode == "3qr" else links[:2]
+    mats = [make_qr(l, level, version)[:2] for l in qrs]
+    v = min(40, max(m[1] for m in mats) + version_boost)
+    mats = [make_qr(l, level, v, mask=masks[i])[0] for i, l in enumerate(qrs)]
+    S = structure(v, level)
+    views = [View("qr", M, S, budget_frac, allow_func=allow_func).rotate(rots[i]) for i, M in enumerate(mats)]
+    n = S["n"]
+    if mode == "2qr_wall":
+        views.append(View("wall", np.ones((n, n), bool)))
+    elif mode == "2qr_logo":
+        views.append(View("logo", logo(logo_kind, n), logo_budget=logo_budget))
+    return views
