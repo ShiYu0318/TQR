@@ -1,0 +1,12 @@
+# Python 3.11+. Versions used during the research.
+numpy==2.4.4
+scipy==1.17.1            # ndimage, sparse.csgraph, optimize.milp (HiGHS)
+qrcode==8.2              # QR matrices and structure tables
+pyzbar==0.1.9            # needs the system ZBar library (brew install zbar / apt install libzbar0)
+zxing-cpp==3.1.1
+opencv-python==4.13.0.92 # homography sampling in egg2.py
+pillow==12.2.0
+networkx==3.6.1          # Steiner struts in solver.py
+manifold3d==3.5.3        # exact mesh union for watertight STL
+trimesh==5.1.0
+matplotlib==3.10.9       # visualize.py
