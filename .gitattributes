@@ -1,0 +1,4 @@
+*.stl binary
+*.npy binary
+*.png binary
+*.html text eol=lf
