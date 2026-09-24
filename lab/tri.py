@@ -289,3 +289,114 @@ def connect_pieces(V, views, k=5.0):
     return np.array(sorted(out)) if out else np.zeros((0, 2), int)
 
 
+# ----------------------------------------------------------------------------- method: free (min cubes)
+def solve_free_greedy(views, use_budget=True, seed=0):
+    """Greedy set cover over feasible cubes, then budgeted removal (lets some black modules go white)."""
+    n = views[0].T.shape[0]
+    Vf = feasible_set(views)
+    req = required(views)
+    cells = np.argwhere(Vf)
+    pid = np.stack([cells[:, 0] * n + cells[:, 1], n * n + cells[:, 0] * n + cells[:, 2], 2 * n * n + cells[:, 1] * n + cells[:, 2]], 1)
+    need = np.concatenate([r.ravel() for r in req]).copy()
+    chosen = np.zeros(len(cells), bool)
+    # bucketed greedy: gain in {0..3}
+    gain = need[pid].sum(1)
+    rng = np.random.default_rng(seed)
+    tie = rng.random(len(cells))
+    while need.any():
+        g = np.where(chosen, -1, gain + tie * 0.5)
+        i = int(np.argmax(g))
+        if gain[i] <= 0:
+            break
+        chosen[i] = True
+        newly = pid[i][need[pid[i]]]
+        need[newly] = False
+        # update gains of cubes sharing those pixels
+        hit = np.isin(pid, newly)
+        gain -= hit.sum(1)
+    V = np.zeros((n, n, n), bool)
+    V[tuple(cells[chosen].T)] = True
+    # redundancy removal (keep coverage) then budgeted removal
+    order = np.flatnonzero(chosen)
+    rng.shuffle(order)
+    cnt = [np.zeros(n * n, int) for _ in range(3)]
+    for i in np.flatnonzero(chosen):
+        for vi in range(3):
+            cnt[vi][pid[i][vi] - vi * n * n] += 1
+    for i in order:
+        if all(cnt[vi][pid[i][vi] - vi * n * n] > 1 for vi in range(3)):
+            V[tuple(cells[i])] = False
+            for vi in range(3):
+                cnt[vi][pid[i][vi] - vi * n * n] -= 1
+    before = third_missing(V, views)
+    if use_budget:
+        for i in order:
+            c = tuple(cells[i])
+            if not V[c]:
+                continue
+            V[c] = False
+            if within_budget(V, views) and third_ok(V, views, before):
+                continue
+            V[c] = True
+    return V
+
+
+def solve_free_milp(views, use_budget=True, time_limit=120, lam=2.0):
+    """Exact minimum cube count (HiGHS). QR black data modules may go white inside the per-block budget;
+    wall/logo pixels are soft (penalty lam each); QR function modules are hard."""
+    from scipy.optimize import milp, LinearConstraint, Bounds
+    n = views[0].T.shape[0]
+    Vf = feasible_set(views)
+    req = required(views)
+    cells = np.argwhere(Vf)
+    nc = len(cells)
+    pix = [cells[:, 0] * n + cells[:, 1], cells[:, 0] * n + cells[:, 2], cells[:, 1] * n + cells[:, 2]]
+    by_pix = [dict() for _ in range(3)]
+    for vi in range(3):
+        order = np.argsort(pix[vi], kind="stable")
+        pv = pix[vi][order]
+        cuts = np.flatnonzero(np.r_[True, pv[1:] != pv[:-1], True])
+        for a, b in zip(cuts[:-1], cuts[1:]):
+            by_pix[vi][int(pv[a])] = order[a:b]
+    rows, cols, vals, lb, ub = [], [], [], [], []
+    cost = [1.0] * nc
+    nv = nc
+    evars, skipped = {}, 0
+    r = 0
+    for vi, (v, rq) in enumerate(zip(views, req)):
+        for p in np.flatnonzero(rq.ravel()):
+            ids = by_pix[vi].get(int(p), np.array([], int))
+            slack = None
+            if v.kind == "qr":
+                if use_budget and v.cw.ravel()[p] >= 0:
+                    k = int(v.cw.ravel()[p])
+                    if (vi, k) not in evars:
+                        evars[(vi, k)] = nv; cost.append(0.0); nv += 1
+                    slack = evars[(vi, k)]
+                elif v.cw.ravel()[p] == -2:
+                    continue                       # remainder bit: free
+            else:
+                slack = nv; cost.append(lam); nv += 1
+            if len(ids) == 0 and slack is None:
+                skipped += 1; continue
+            rows += [r] * len(ids); cols += list(ids); vals += [1] * len(ids)
+            if slack is not None:
+                rows.append(r); cols.append(slack); vals.append(1)
+            lb.append(1); ub.append(np.inf); r += 1
+    for vi, v in enumerate(views):
+        if v.kind == "qr" and use_budget:
+            for b in range(len(v.S["cap"])):
+                ks = [evars[(vi, int(k))] for k in np.flatnonzero(v.S["blk"] == b) if (vi, int(k)) in evars]
+                if ks:
+                    rows += [r] * len(ks); cols += ks; vals += [1] * len(ks)
+                    lb.append(-np.inf); ub.append(int(v.budget[b])); r += 1
+    A = sparse.csr_matrix((vals, (rows, cols)), shape=(r, nv))
+    res = milp(np.array(cost), constraints=LinearConstraint(A, lb, ub), integrality=np.ones(nv), bounds=Bounds(0, 1),
+               options={"time_limit": time_limit, "disp": False})
+    x = res.x[:nc] > 0.5 if res.x is not None else np.zeros(nc, bool)
+    V = np.zeros((n, n, n), bool)
+    V[tuple(cells[x].T)] = True
+    return V, {"status": int(res.status), "gap": getattr(res, "mip_gap", None), "skipped": skipped,
+               "lower_bound": getattr(res, "mip_dual_bound", None)}
+
+
