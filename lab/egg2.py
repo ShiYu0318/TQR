@@ -19,8 +19,8 @@ def cell_map(view, r, c, n):
     if view == "T": return c, n - 1 - r
     if view == "N": return n - 1 - c, r
     if view == "S": return c, n - 1 - r
-    if view == "E": return r, n - 1 - c
-    if view == "W": return n - 1 - r, c
+    if view == "E": return r, c                 # facing west: right = north, top = far = west
+    if view == "W": return n - 1 - r, n - 1 - c # facing east: right = south, top = far = east
 
 
 def function_mask(n):
