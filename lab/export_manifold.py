@@ -29,8 +29,9 @@ def boxes_from_mask(M):
 
 def mask_to_mesh(M, scale):
     bx = boxes_from_mask(M)
-    parts = [mf.Manifold.cube([(b[3] - b[0]) * scale, (b[4] - b[1]) * scale, (b[5] - b[2]) * scale])
-             .translate([b[0] * scale, b[1] * scale, b[2] * scale]) for b in bx]
+    e = 1e-4  # mm: make face-sharing boxes overlap so the union fuses them into one shell
+    parts = [mf.Manifold.cube([(b[3] - b[0]) * scale + 2 * e, (b[4] - b[1]) * scale + 2 * e, (b[5] - b[2]) * scale + 2 * e])
+             .translate([b[0] * scale - e, b[1] * scale - e, b[2] * scale - e]) for b in bx]
     u = mf.Manifold.batch_boolean(parts, mf.OpType.Add)
     m = u.to_mesh()
     tm = trimesh.Trimesh(vertices=np.asarray(m.vert_properties)[:, :3], faces=np.asarray(m.tri_verts), process=False)
