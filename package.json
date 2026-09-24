@@ -1,0 +1,18 @@
+{
+  "name": "tqr",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Multi-view QR sculptures: JS solver tests and browser tests",
+  "scripts": {
+    "test:js": "cd lab && node jstest.js",
+    "test:e2e": "echo not included",
+    "build:extra": "echo not included"
+  },
+  "devDependencies": {
+    "@zxing/library": "0.21.3",
+    "jsqr": "1.4.0",
+    "playwright": "1.56.0",
+    "qrcode-generator": "1.4.4",
+    "three": "0.147.0"
+  }
+}
