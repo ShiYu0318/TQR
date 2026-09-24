@@ -146,3 +146,27 @@ if __name__ == "__main__":
         print(f"v{v}-H n={S['n']} blocks={len(S['cap'])} ec/block={S['nec']} correctable/block={list(S['cap'])} "
               f"func={int(S['func'].sum())} remainder={int((S['cw']==-2).sum())}")
 
+
+def function_classes(version):
+    """Label map of function modules: 0 data, 1 finder (7x7, incl. its inner white ring), 2 separator,
+       3 timing, 4 alignment, 5 format/version info, 6 dark module."""
+    n = 17 + 4 * version
+    L = np.zeros((n, n), np.int8)
+    for r0, c0 in ((0, 0), (0, n - 7), (n - 7, 0)):
+        L[max(r0 - 1, 0):r0 + 8, max(c0 - 1, 0):c0 + 8] = 2
+        L[r0:r0 + 7, c0:c0 + 7] = 1
+    tim = np.zeros((n, n), bool); tim[6, 8:n - 8] = True; tim[8:n - 8, 6] = True
+    L[tim] = 3
+    for r in qu.pattern_position(version):
+        for c in qu.pattern_position(version):
+            if (r < 9 and c < 9) or (r < 9 and c > n - 10) or (r > n - 10 and c < 9):
+                continue
+            L[r - 2:r + 3, c - 2:c + 3] = 4
+    fmt = np.zeros((n, n), bool)
+    fmt[8, :9] = True; fmt[:9, 8] = True; fmt[8, n - 8:] = True; fmt[n - 8:, 8] = True
+    if version >= 7:
+        fmt[:6, n - 11:n - 8] = True; fmt[n - 11:n - 8, :6] = True
+    L[fmt & (L != 1)] = 5
+    L[n - 8, 8] = 6
+    assert ((L > 0) == function_mask(version)).all()
+    return L
