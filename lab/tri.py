@@ -400,3 +400,45 @@ def solve_free_milp(views, use_budget=True, time_limit=120, lam=2.0):
                "lower_bound": getattr(res, "mip_dual_bound", None)}
 
 
+# ----------------------------------------------------------------------------- method: strut
+def prune_keep_coverage(V, views, seed=0):
+    V = V.copy()
+    n = V.shape[0]
+    cnt = project_counts(V)
+    lab, K = ndimage.label(V, structure=S6)
+    sizes = ndimage.sum(V, lab, range(1, K + 1))
+    cells = np.argwhere(V)
+    order = np.lexsort((np.random.default_rng(seed).random(len(cells)), sizes[lab[V] - 1]))
+    for i in order:
+        x, y, z = cells[i]
+        if cnt[0][x, y] > 1 and cnt[1][x, z] > 1 and cnt[2][y, z] > 1:
+            V[x, y, z] = False
+            cnt[0][x, y] -= 1; cnt[1][x, z] -= 1; cnt[2][y, z] -= 1
+    return V
+
+
+def project_counts(V):
+    return V.sum(2), V.sum(1), V.sum(0)
+
+
+def solve_strut(views, prune=True):
+    """Original method: pruned feasible cubes + Steiner-tree struts along module boundaries."""
+    V = feasible_set(views)
+    if prune:
+        V = prune_keep_coverage(V, views)
+    E = connect_pieces(V, views)
+    return V, E, {"islands": components(V)[0], "strut_edges": len(E)}
+
+
+def strut_fine(V, E, k=5):
+    """Fine voxel model (for exact checks): cubes k^3, struts 1 subvoxel wide on module-corner lines."""
+    n = V.shape[0]
+    F = np.kron(V, np.ones((k, k, k), bool))
+    for u, v in E:
+        pu = np.array(np.unravel_index(u, (n, n, n))) * k
+        pv = np.array(np.unravel_index(v, (n, n, n))) * k
+        lo, hi = np.minimum(pu, pv), np.maximum(pu, pv)
+        F[lo[0]:hi[0] + 1, lo[1]:hi[1] + 1, lo[2]:hi[2] + 1] = True
+    return F
+
+
