@@ -564,7 +564,10 @@ var TRI = (function () {
     var opts = {budget: spec.budget, allowFunc: spec.relaxed ? [2, 3, 4] : [], logoBudget: spec.logoBudget};
     var views = spec.qr.map(function (T) { return makeView("qr", T, S, opts); });
     // spec.overlays[i] = {region, pixels} (Uint8Array n*n) puts a centre logo on QR view i
-    (spec.overlays || []).forEach(function (o, i) { if (o && views[i] && views[i].kind === "qr") overlay(views[i], o.region, o.pixels); });
+    (spec.overlays || []).forEach(function (o, i) {
+      if (!o || !views[i] || views[i].kind !== "qr") return;
+      try { overlay(views[i], o.region, o.pixels); } catch (e) { throw new Error(e.message + ":" + i); }   // add the view index
+    });
     if (spec.mode === "2qr_wall") views.push(makeView("wall", new Uint8Array(n * n).fill(1), null, opts));
     if (spec.mode === "2qr_logo") views.push(makeView("logo", spec.logo, null, opts));
     var V, E = [], bridgeMask = null, info = {};
