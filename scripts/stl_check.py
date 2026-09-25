@@ -6,8 +6,8 @@ from scipy import ndimage
 from tqr.paths import DATA, MODELS
 
 def check_stl(path):
-    tm = trimesh.load(path, process=False)
-    print(f"{path}: watertight={tm.is_watertight} winding={tm.is_winding_consistent} volume={tm.volume/1000:.2f} cm3 tris={len(tm.faces)}")
+    tm = trimesh.load(path)   # STL has no shared vertices: they must be merged (process=True) before any topology check
+    print(f"{path}: watertight={tm.is_watertight} winding={tm.is_winding_consistent} bodies={len(tm.split(only_watertight=False))} volume={tm.volume/1000:.2f} cm3 tris={len(tm.faces)}")
 
 def check_voids(npy):
     F = np.load(npy)
