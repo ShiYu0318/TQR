@@ -4,7 +4,7 @@
   "private": true,
   "description": "Multi-view QR sculptures: JS solver tests and browser tests",
   "scripts": {
-    "test:js": "cd lab && node jstest.js",
+    "test:js": "node tests/jstest.js",
     "test:e2e": "echo not included",
     "build:extra": "echo not included"
   },
