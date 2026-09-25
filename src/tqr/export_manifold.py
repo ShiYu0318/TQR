@@ -28,14 +28,32 @@ def boxes_from_mask(M):
     return out
 
 
+def weld_float32(vertices, faces):
+    """Weld vertices that share a float32 position (as an STL reader does) and drop triangles that collapse.
+    Returns (vertices, faces, closed) where closed means every edge is shared by exactly two triangles."""
+    key = np.asarray(vertices, np.float32)
+    uniq, inv = np.unique(key, axis=0, return_inverse=True)
+    f = inv.ravel()[np.asarray(faces)]
+    f = f[(f[:, 0] != f[:, 1]) & (f[:, 1] != f[:, 2]) & (f[:, 0] != f[:, 2])]
+    e = np.sort(np.concatenate([f[:, [0, 1]], f[:, [1, 2]], f[:, [2, 0]]]), axis=1)
+    _, counts = np.unique(e, axis=0, return_counts=True)
+    return uniq.astype(np.float64), f, bool((counts == 2).all())
+
+
 def mask_to_mesh(M, scale):
+    """Exact union of the mask's boxes. Face-sharing boxes overlap by e so the union fuses them; STL stores float32
+    positions without vertex indices, so the mesh is welded the way a reader would, and e grows until that welded
+    mesh is closed (1e-4 mm, the old value, left sub-float32 slivers that fell apart when the STL was read back)."""
     bx = boxes_from_mask(M)
-    e = 1e-4  # mm: make face-sharing boxes overlap so the union fuses them into one shell
-    parts = [mf.Manifold.cube([(b[3] - b[0]) * scale + 2 * e, (b[4] - b[1]) * scale + 2 * e, (b[5] - b[2]) * scale + 2 * e])
-             .translate([b[0] * scale - e, b[1] * scale - e, b[2] * scale - e]) for b in bx]
-    u = mf.Manifold.batch_boolean(parts, mf.OpType.Add)
-    m = u.to_mesh()
-    tm = trimesh.Trimesh(vertices=np.asarray(m.vert_properties)[:, :3], faces=np.asarray(m.tri_verts), process=False)
+    for e in (2e-3, 5e-3, 1e-2):  # mm
+        parts = [mf.Manifold.cube([(b[3] - b[0]) * scale + 2 * e, (b[4] - b[1]) * scale + 2 * e, (b[5] - b[2]) * scale + 2 * e])
+                 .translate([b[0] * scale - e, b[1] * scale - e, b[2] * scale - e]) for b in bx]
+        u = mf.Manifold.batch_boolean(parts, mf.OpType.Add)
+        m = u.to_mesh()
+        v, f, closed = weld_float32(np.asarray(m.vert_properties)[:, :3], np.asarray(m.tri_verts))
+        if closed:
+            break
+    tm = trimesh.Trimesh(vertices=v, faces=f, process=False)
     return tm, len(bx), len(u.decompose())
 
 
