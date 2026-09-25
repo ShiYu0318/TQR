@@ -81,7 +81,8 @@ var TRI = (function () {
     var n = Math.round(Math.sqrt(T.length)), v = {kind: kind, T: T, S: S, n: n}, i;
     if (kind === "qr") {
       v.func = S.func; v.cw = S.cw; v.fclass = S.fclass;
-      v.budget = Array.from(S.cap).map(function (c) { return Math.floor((opts.budget == null ? 0.5 : opts.budget) * c + 1e-9); });
+      v.budgetFrac = opts.budget == null ? 0.5 : opts.budget;
+      v.budget = Array.from(S.cap).map(function (c) { return Math.floor(v.budgetFrac * c + 1e-9); });
     } else {
       v.func = new Uint8Array(n * n); v.cw = new Int32Array(n * n).fill(-1); v.fclass = new Int8Array(n * n);
     }
@@ -90,10 +91,28 @@ var TRI = (function () {
     for (i = 0; i < n * n; i++) v.benign[i] = (v.func[i] && allow.indexOf(v.fclass[i]) >= 0) ? 1 : 0;
     v.funcCost = opts.funcCost || 4.0;
     v.accepted = new Uint8Array(n * n);
+    v.Tqr = T;                          // certificate reference; differs from T only under an overlay
+    v.preBad = null;                    // codewords an overlay (centre logo) already breaks
+    v.keepLight = null;                 // overlay pixels that must stay light (bridges go around them)
     if (kind === "logo") {
       var white = 0; for (i = 0; i < n * n; i++) if (!T[i]) white++;
       v.logoBudget = Math.floor((opts.logoBudget == null ? 0.1 : opts.logoBudget) * white);
     } else v.logoBudget = 0;
+    return v;
+  }
+
+  // Show `pixels` inside `region` (a centre logo) instead of the QR there; function modules are never overridden.
+  // Codewords the overlay breaks count as errors from the start; bridges may use budgetFrac of the capacity LEFT:
+  //   budget = logoErrors + floor(budgetFrac * (cap - logoErrors)).  The certificate always uses the original QR.
+  function overlay(v, region, pixels) {
+    var n2 = v.T.length, T = new Uint8Array(v.T), keep = new Uint8Array(n2), pre = new Uint8Array(v.S.total), i, b;
+    for (i = 0; i < n2; i++) if (region[i] && !v.func[i]) { T[i] = pixels[i] ? 1 : 0; keep[i] = pixels[i] ? 0 : 1; }
+    for (i = 0; i < n2; i++) if (T[i] !== v.T[i] && v.cw[i] >= 0) pre[v.cw[i]] = 1;
+    var preBlk = new Int32Array(v.S.cap.length);
+    for (i = 0; i < v.S.total; i++) if (pre[i]) preBlk[v.S.blk[i]]++;
+    for (b = 0; b < preBlk.length; b++) if (preBlk[b] > v.S.cap[b]) throw new Error("LOGO_TOO_LARGE:" + b + ":" + preBlk[b] + ":" + v.S.cap[b]);
+    v.Tqr = v.T; v.T = T; v.preBad = pre; v.preBlk = preBlk; v.keepLight = keep;
+    v.budget = Array.from(v.S.cap).map(function (c, b) { return preBlk[b] + Math.floor(v.budgetFrac * (c - preBlk[b]) + 1e-9); });
     return v;
   }
 
@@ -109,6 +128,7 @@ var TRI = (function () {
         var flipped = (dark[i] && !v.T[i] && !v.func[i]) || (v.accepted[i] && !dark[i]);
         if (flipped && v.cw[i] >= 0) bad[v.cw[i]] = 1;
       }
+      if (v.preBad) for (i = 0; i < v.S.total; i++) if (v.preBad[i]) bad[i] = 1;
       var blkBad = new Int32Array(v.S.cap.length);
       for (i = 0; i < v.S.total; i++) if (bad[i]) blkBad[v.S.blk[i]]++;
       return {bad: bad, blkBad: blkBad};
@@ -130,6 +150,7 @@ var TRI = (function () {
     }
     for (i = 0; i < n2; i++) {
       if (dark[i] || v.T[i]) { out[i] = 0; continue; }
+      if (v.keepLight && v.keepLight[i]) { out[i] = INF; continue; }   // never deface the overlay
       if (v.func[i]) { out[i] = v.benign[i] ? v.funcCost : INF; continue; }
       var k = v.cw[i];
       if (k === -2) { out[i] = 0; continue; }
@@ -428,7 +449,7 @@ var TRI = (function () {
     for (var vi = 0; vi < 3; vi++) {
       var v = views[vi];
       if (v.kind === "qr") {
-        var c = certificate(P[vi], v.T, v.S);
+        var c = certificate(P[vi], v.Tqr, v.S);
         if (c.funcErrors) return false;
         for (var b = 0; b < c.blockErrors.length; b++) if (c.blockErrors[b] > v.budget[b]) return false;
       } else if (v.kind === "logo") {
@@ -504,7 +525,7 @@ var TRI = (function () {
   function evaluate(V, views, n) {
     var P = project(V, n);
     return views.map(function (v, vi) {
-      if (v.kind === "qr") { var c = certificate(P[vi], v.T, v.S); c.budget = v.budget; return c; }
+      if (v.kind === "qr") { var c = certificate(P[vi], v.Tqr, v.S); c.budget = v.budget; c.logoBlocks = v.preBlk ? Array.from(v.preBlk) : null; return c; }
       var flips = 0, missing = 0;
       for (var i = 0; i < P[vi].length; i++) {
         if (P[vi][i] && !v.T[i] && v.kind === "logo") flips++;
@@ -542,6 +563,8 @@ var TRI = (function () {
     var S = structure(spec.version, spec.level || "H"), n = S.n, t0 = Date.now();
     var opts = {budget: spec.budget, allowFunc: spec.relaxed ? [2, 3, 4] : [], logoBudget: spec.logoBudget};
     var views = spec.qr.map(function (T) { return makeView("qr", T, S, opts); });
+    // spec.overlays[i] = {region, pixels} (Uint8Array n*n) puts a centre logo on QR view i
+    (spec.overlays || []).forEach(function (o, i) { if (o && views[i] && views[i].kind === "qr") overlay(views[i], o.region, o.pixels); });
     if (spec.mode === "2qr_wall") views.push(makeView("wall", new Uint8Array(n * n).fill(1), null, opts));
     if (spec.mode === "2qr_logo") views.push(makeView("logo", spec.logo, null, opts));
     var V, E = [], bridgeMask = null, info = {};
@@ -560,7 +583,7 @@ var TRI = (function () {
   }
 
   return {setTables: setTables, structure: structure, functionClasses: functionClasses, certificate: certificate,
-          generate: generate, logoRaw: logoRaw, badge: badge, feasibleSet: feasibleSet, project: project,
+          generate: generate, overlay: overlay, logoRaw: logoRaw, badge: badge, feasibleSet: feasibleSet, project: project,
           components: components, label: label};
 })();
 if (typeof module !== "undefined") module.exports = TRI;

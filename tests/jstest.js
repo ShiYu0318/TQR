@@ -20,6 +20,18 @@ for (const [key, R] of Object.entries(levels)) {
 }
 console.log(`levels L/M/Q/H: ${Object.keys(levels).length - levelBad}/${Object.keys(levels).length} structures match Python`);
 bad += levelBad;
+
+// centre-logo overlay: same codewords broken and same block budgets as Python; every view still certified
+// (fixture from tests/make_overlay_ref.py)
+const ov = require('./fixtures/js_ref_overlay.json');
+const U8 = a => Uint8Array.from(a);
+const ovRes = TRI.generate({qr: ov.qr.map(U8), version: ov.version, level: 'H', mode: '3qr', method: 'bridge+strut', budget: ov.budget,
+                            overlays: ov.qr.map(() => ({region: U8(ov.region), pixels: U8(ov.pixels)}))});
+const sameArr = (a, b) => a.length === b.length && a.every((x, i) => x === b[i]);
+const ovOk = ovRes.evals.every((e, i) => e.ok && sameArr(e.logoBlocks, ov.logo_blocks[i]) && sameArr(Array.from(e.budget), ov.block_budget[i]));
+console.log(`centre logo: logo breaks ${JSON.stringify(ovRes.evals.map(e => e.logoBlocks))}, budgets ${JSON.stringify(ovRes.evals.map(e => Array.from(e.budget)))}, ` +
+            `cert=[${ovRes.evals.map(e => e.ok)}] ${ovOk ? 'matches Python' : 'MISMATCH'}`);
+if (!ovOk) bad++;
 const qr = ref.demo.qr.map(a => Uint8Array.from(a));
 for (const [mode, method, relaxed] of [['3qr','dust',false],['3qr','strut',false],['3qr','bridge',false],['3qr','bridge+strut',false],['3qr','bridge',true],['3qr','free',false]]) {
   const r = TRI.generate({qr, version: ref.demo.version, level: 'H', mode, method, relaxed, budget: 0.5});

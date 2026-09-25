@@ -37,6 +37,7 @@ class View:
             self.cw = S["cw"]
             self.fclass = function_classes(S["version"])
             self.budget = np.floor(budget_frac * S["cap"]).astype(int)
+            self.budget_frac = budget_frac
         else:
             self.func = np.zeros((n, n), bool)
             self.cw = np.full((n, n), -1)
@@ -45,10 +46,36 @@ class View:
         self.func_cost = func_cost
         self.accepted = np.zeros((n, n), bool)      # black data modules deliberately left white
         self.logo_budget = int(logo_budget * (~self.T).sum()) if kind == "logo" else 0
+        self.Tqr = self.T                            # certificate reference; differs from T only under an overlay
+        self.pre_bad = None                          # codewords an overlay (centre logo) already breaks
+        self.keep_light = np.zeros((n, n), bool)     # overlay pixels that must stay light (bridges go around them)
+
+    def overlay(self, region, pixels):
+        """Show `pixels` inside `region` (e.g. a centre logo) instead of the QR modules there.
+        Function modules are never overridden. The codewords the overlay breaks are counted as errors from the
+        start; bridges may then use budget_frac of the capacity that is LEFT, so a noise margin always remains:
+            budget = logo_errors + floor(budget_frac * (cap - logo_errors)).
+        The final certificate is always computed against the original QR (Tqr), so decodability stays exact."""
+        region = np.asarray(region, bool) & ~self.func
+        self.Tqr = self.T.copy()
+        self.T = np.where(region, np.asarray(pixels, bool), self.T)
+        self.keep_light = region & ~self.T
+        diff = (self.T != self.Tqr) & (self.cw >= 0)
+        pre = np.zeros(self.S["total"], bool)
+        pre[self.cw[diff]] = True
+        pre_blk = np.bincount(self.S["blk"][pre], minlength=len(self.S["cap"]))
+        if (pre_blk > self.S["cap"]).any():
+            b = int(np.argmax(pre_blk - self.S["cap"]))
+            raise ValueError(f"LOGO_TOO_LARGE:{b}:{int(pre_blk[b])}:{int(self.S['cap'][b])}")
+        self.pre_bad, self.pre_blk = pre, pre_blk
+        self.budget = pre_blk + np.floor(self.budget_frac * (self.S["cap"] - pre_blk) + 1e-9).astype(int)
+        return self
 
     def rotate(self, k):
         """Rotate target and all structure maps together (orientation freedom)."""
         self.T = np.rot90(self.T, k)
+        self.Tqr = np.rot90(self.Tqr, k)
+        self.keep_light = np.rot90(self.keep_light, k)
         for a in ("func", "cw", "fclass", "benign", "accepted"):
             setattr(self, a, np.rot90(getattr(self, a), k))
         return self
@@ -60,6 +87,8 @@ class View:
             bad = np.zeros(self.S["total"], bool)
             c = self.cw[flipped & (self.cw >= 0)]
             bad[c] = True
+            if self.pre_bad is not None:
+                bad |= self.pre_bad
             blk_bad = np.bincount(self.S["blk"][bad], minlength=len(self.S["cap"]))
             return {"bad": bad, "blk_bad": blk_bad}
         if self.kind == "logo":
@@ -85,6 +114,7 @@ class View:
         cost = np.where(data, dc, cost)
         cost = np.where(self.cw == -2, 0.0, cost)          # remainder bits carry nothing
         cost = np.where(self.func, np.where(self.benign, self.func_cost, INF), cost)
+        cost = np.where(self.keep_light, INF, cost)      # never deface the overlay
         return np.where(free, 0.0, cost)
 
 
@@ -447,7 +477,7 @@ def within_budget(V, views):
     """Stricter than the certificate: QR errors must stay inside the safety budget, not just the RS capacity."""
     for v, d in zip(views, project(V)):
         if v.kind == "qr":
-            c = certificate(d, v.T, v.S)
+            c = certificate(d, v.Tqr, v.S)
             if c["func_errors"] or (c["block_errors"] > v.budget).any():
                 return False
         elif v.kind == "logo":
@@ -469,8 +499,9 @@ def evaluate_views(V, views):
     out = []
     for v, d in zip(views, project(V)):
         if v.kind == "qr":
-            c = certificate(d, v.T, v.S)
+            c = certificate(d, v.Tqr, v.S)
             c["budget"] = v.budget
+            c["logo_blocks"] = v.pre_blk if v.pre_bad is not None else np.zeros_like(v.budget)
             out.append(c)
         elif v.kind == "logo":
             wrong = d != v.T
@@ -530,6 +561,18 @@ def _logo_raw(kind, n, text="NCU"):
         dr.text(((big - (bb[2] - bb[0])) / 2 - bb[0], (big - (bb[3] - bb[1])) / 2 - bb[1]), text, fill=0, font=f)
         return np.asarray(im.resize((n, n), Image.BOX)) < 128
     raise ValueError(kind)
+
+
+def center_overlay(n, size, pixels, dx=0, dy=0):
+    """Region mask of a size×size square centred in an n×n code (shifted by dx columns, dy rows) and the full-size
+    pixel image with `pixels` (size×size bool) placed inside it. Returns (region, image)."""
+    region = np.zeros((n, n), bool)
+    image = np.zeros((n, n), bool)
+    r0 = (n - size) // 2 + dy
+    c0 = (n - size) // 2 + dx
+    region[r0:r0 + size, c0:c0 + size] = True
+    image[r0:r0 + size, c0:c0 + size] = np.asarray(pixels, bool)
+    return region, image
 
 
 def build_views(links, mode="3qr", level="H", budget_frac=0.5, logo_kind="heart", logo_budget=0.1,
