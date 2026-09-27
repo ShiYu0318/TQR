@@ -22,6 +22,14 @@ export function generate() {
 // numbers and checks under it. Areas are filled in by the following steps.
 export function App() {
   useEffect(() => generate(), []);
+  // each model opens on its own view: the sculpture from the front at scanning distance, the tile from the north
+  const model = useStudio((s) => s.model);
+  useEffect(() => {
+    const s = useStudio.getState();
+    s.setCamera({ spin: null });
+    if (model === "tile") s.requestView(0, 40, 30);
+    else if (s.result) s.requestView(0, 0, farDistanceCm(s.result.n, s.moduleMm.sil));
+  }, [model]);
   return (
     <div className="app">
       <Header />

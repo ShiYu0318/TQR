@@ -12,6 +12,8 @@ interface Props {
   model: Model;
   /** framing size of the model (mm): the floor and shadow scale with it */
   size: number;
+  /** the tile's width and depth (mm); the tile lies on the floor */
+  footprint: [number, number];
 }
 
 function skyTexture(stops: BackdropSpec["sky"]) {
@@ -92,7 +94,7 @@ const FLOOR_TILT = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 
  * stays put on screen, seen from 25° above and right under the model, whichever way the model turns. The egg-crate
  * tile really lies on its floor, so there the floor stays fixed in the world.
  */
-export function Backdrop({ backdrop, backlit, floor, model, size }: Props) {
+export function Backdrop({ backdrop, backlit, floor, model, size, footprint }: Props) {
   const scene = useThree((s) => s.scene);
   const camera = useThree((s) => s.camera);
   const spec = BACKDROPS[backdrop] ?? BACKDROPS.graphite;
@@ -117,6 +119,8 @@ export function Backdrop({ backdrop, backlit, floor, model, size }: Props) {
     if (!group.current || !floorMesh.current || !shadowMesh.current) return;
     if (model !== "sil") {
       group.current.quaternion.identity();
+      floorMesh.current.position.y = -0.6; // the tile's underside is y = 0
+      shadowMesh.current.position.y = -0.3;
       return;
     }
     group.current.quaternion.copy(camera.quaternion).multiply(FLOOR_TILT);
@@ -128,13 +132,14 @@ export function Backdrop({ backdrop, backlit, floor, model, size }: Props) {
   });
 
   if (backlit || !floor) return null;
+  const [W, Dp] = footprint, tile = model === "tile";
   return (
     <group ref={group}>
-      <mesh ref={floorMesh} rotation-x={-Math.PI / 2} scale={[S * 4, S * 4, 1]} renderOrder={-2}>
+      <mesh ref={floorMesh} rotation-x={-Math.PI / 2} scale={tile ? [W * 3.2, W * 3.2, 1] : [S * 4, S * 4, 1]} renderOrder={-2}>
         <planeGeometry />
         <meshBasicMaterial map={floorMap} transparent depthWrite={false} />
       </mesh>
-      <mesh ref={shadowMesh} rotation-x={-Math.PI / 2} scale={[S * 1.6, S * 1.6, 1]} renderOrder={-1}>
+      <mesh ref={shadowMesh} rotation-x={-Math.PI / 2} scale={tile ? [W * 1.3, Dp * 1.3, 1] : [S * 1.6, S * 1.6, 1]} renderOrder={-1}>
         <planeGeometry />
         <meshBasicMaterial map={shadowMap} transparent depthWrite={false} />
       </mesh>

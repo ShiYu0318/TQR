@@ -6,6 +6,7 @@ import { placeholder } from "@/lib/solve";
 import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Sculpture } from "./Sculpture";
+import { Tile, tileFootprint } from "./Tile";
 import { publishLive } from "./live";
 import { SpinDriver } from "./SpinDriver";
 
@@ -37,10 +38,13 @@ export function Stage() {
   const result = useStudio((s) => s.result);
   const model = useStudio((s) => s.model);
   const moduleMm = useStudio((s) => s.moduleMm.sil);
+  const tileMm = useStudio((s) => s.moduleMm.tile);
   const strut = useStudio((s) => s.design.strut);
   const look = useStudio((s) => s.look);
   const shown = useMemo(() => result ?? placeholder(), [result]);
-  const size = shown.n * moduleMm * 1.25;
+  const footprint = tileFootprint(tileMm);
+  const tile = model === "tile";
+  const size = tile ? footprint[0] : shown.n * moduleMm * 1.25;
   return (
     <Canvas
       className="block h-full w-full touch-none"
@@ -53,9 +57,14 @@ export function Stage() {
       <hemisphereLight args={[0xffffff, 0x55605a, 0.55 * LEGACY]} />
       <directionalLight position={[0.3, 1, -0.2]} intensity={0.55 * LEGACY} />
       <HeadLight />
-      <Backdrop backdrop={look.backdrop} backlit={model === "sil" && look.look === "sil"} floor={look.floor} model={model} size={size} />
-      <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} />
-      <CameraRig size={size} minPolar={0.001} maxPolar={Math.PI - 0.001} />
+      <Backdrop backdrop={look.backdrop} backlit={model === "sil" && look.look === "sil"} floor={look.floor} model={model} size={size} footprint={footprint} />
+      {tile ? (
+        <Tile moduleMm={tileMm} dark={look.colors.dark} light={look.colors.light} />
+      ) : (
+        <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} />
+      )}
+      {/* the tile is never seen from under the table */}
+      <CameraRig size={size} minPolar={0.001} maxPolar={tile ? Math.PI / 2 - 0.02 : Math.PI - 0.001} />
       <SpinDriver />
       <LiveCamera />
     </Canvas>
