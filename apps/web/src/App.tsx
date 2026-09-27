@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Header } from "@/components/Header";
 import { LeftSidebar, RightSidebar } from "@/components/Sidebars";
 import { StageView } from "@/stage/StageView";
+import { BottomStats } from "@/components/BottomStats";
 import { farDistanceCm } from "@/three/geometry";
 import { generate } from "@/lib/actions";
 import { useStudio } from "@/store";
@@ -24,10 +25,7 @@ export function App() {
       <LeftSidebar />
       <StageView />
       <RightSidebar />
-      <section className="area-bottom grid grid-cols-[minmax(0,.75fr)_minmax(0,1.25fr)] gap-3 max-[900px]:grid-cols-1" aria-label="數字資訊與檢查結果">
-        <div className="rounded-lg border border-rule bg-panel" />
-        <div className="rounded-lg border border-rule bg-panel" />
-      </section>
+      <BottomStats />
     </div>
   );
 }

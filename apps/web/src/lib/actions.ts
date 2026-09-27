@@ -7,7 +7,7 @@ export function generate() {
   const { design, moduleMm, model, setResult, setBusy, requestView, resetFound } = useStudio.getState();
   try {
     const { result, links } = solve(design);
-    setResult(result, links);
+    setResult(result, links, design);
     resetFound("sil");
     setBusy(false);
     if (model === "sil") requestView(0, 0, farDistanceCm(result.n, moduleMm.sil));

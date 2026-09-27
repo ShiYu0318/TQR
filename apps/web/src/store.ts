@@ -69,6 +69,8 @@ interface State {
   result: Result | null;
   /** the text each generated view encodes */
   links: string[];
+  /** the design the current result was generated from (the panels may have moved on since) */
+  generatedWith: Design | null;
   /** physical module size in mm, per model */
   moduleMm: Record<Model, number>;
   viewRequest: ViewRequest;
@@ -85,7 +87,7 @@ interface State {
   setContent(i: number, content: Content): void;
   setLook(patch: Partial<Look3D>): void;
   setCamera(patch: Partial<Camera>): void;
-  setResult(result: Result | null, links?: string[]): void;
+  setResult(result: Result | null, links?: string[], design?: Design | null): void;
   requestView(azimuth: number, elevation: number, distanceCm?: number): void;
   setBusy(busy: boolean, message?: string): void;
   markFound(model: Model, key: string): void;
@@ -116,6 +118,7 @@ export const useStudio = create<State>()(
       camera: { distanceCm: 600, spin: null, spinSpeed: 21 },
       result: null,
       links: [],
+      generatedWith: null,
       moduleMm: { sil: 3, tile: 5 },
       viewRequest: { azimuth: 0, elevation: 0, distanceCm: 600, id: 0 },
       busy: false,
@@ -135,7 +138,7 @@ export const useStudio = create<State>()(
         }),
       setLook: (patch) => set((s) => ({ look: { ...s.look, ...patch } })),
       setCamera: (patch) => set((s) => ({ camera: { ...s.camera, ...patch } })),
-      setResult: (result, links = []) => set({ result, links }),
+      setResult: (result, links = [], design = null) => set({ result, links, generatedWith: design }),
       requestView: (azimuth, elevation, distanceCm) =>
         set((s) => ({ viewRequest: { azimuth, elevation, distanceCm, id: s.viewRequest.id + 1 } })),
       setBusy: (busy, message = "") => set({ busy, message }),
