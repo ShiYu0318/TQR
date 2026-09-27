@@ -4,6 +4,7 @@ import { Note, Panel } from "./Panel";
 import { ContentPanel } from "@/panels/ContentPanel";
 import { StructurePanel } from "@/panels/StructurePanel";
 import { LookPanel } from "@/panels/LookPanel";
+import { CenterLogoPanel } from "@/panels/CenterLogoPanel";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -17,9 +18,7 @@ export function LeftSidebar() {
         {sil ? <ContentPanel /> : null}
         <StructurePanel />
         <LookPanel />
-        <Panel id="logo" title="中央 Logo" side="left" hidden={!sil}>
-          <Note>（下一步填入）</Note>
-        </Panel>
+        {sil && <CenterLogoPanel />}
       </div>
       {sil && (
         <div className="flex flex-none flex-col gap-1.5 pt-3" id="genActions">

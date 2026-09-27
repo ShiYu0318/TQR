@@ -3,6 +3,7 @@ import type { Design } from "@/store";
 import { qrMatrix, qrVersion } from "./qr";
 import { encodeContent } from "./content";
 import { imageToSide, sideLogoImage } from "./sideLogo";
+import { centerLogoOverlay, logoErrorMessage } from "./centerLogo";
 
 export interface Solved {
   result: Result;
@@ -40,7 +41,14 @@ export function solve(design: Design): Solved {
   };
   const n = 17 + 4 * version;
   if (design.mode === "2qr_logo") spec.logo = imageToSide(sideLogoImage(design.sideLogo, n), n);
-  return { result: TRI.generate(spec), links };
+  const L = design.centerLogo;
+  if (L.kind !== "none") spec.overlays = spec.qr.map((_, i) => (L.views.includes(i) ? centerLogoOverlay(n, L, i) : null));
+  try {
+    return { result: TRI.generate(spec), links };
+  } catch (e) {
+    const msg = (e as Error).message;
+    throw new Error(logoErrorMessage(msg) ?? `生成失敗：${msg.split("\n")[0]}`);
+  }
 }
 
 /**

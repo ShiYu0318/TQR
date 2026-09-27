@@ -4,6 +4,7 @@ import type { Level, Method, Mode, Result } from "@tqr/tri-core";
 import { DEFAULT_COLORS, type Colors } from "@/three/palette";
 import type { Values } from "@/lib/content";
 import type { SideLogo } from "@/lib/sideLogo";
+import type { CenterLogo } from "@/lib/centerLogo";
 
 export type Lang = "zh" | "en";
 export type Model = "sil" | "tile";
@@ -30,6 +31,8 @@ export interface Design {
   strut: number;
   /** the side picture of "2 QR + logo" */
   sideLogo: SideLogo;
+  /** a logo in the middle of the QR views */
+  centerLogo: CenterLogo;
 }
 
 export interface Look3D {
@@ -113,6 +116,7 @@ export const useStudio = create<State>()(
         budget: 50,
         strut: 20,
         sideLogo: { kind: "heart", text: "NCU", badge: true, budget: 10 },
+        centerLogo: { kind: "none", text: "QR", font: "sans", style: "outline", size: 9, margin: 1, dx: 0, dy: 0, views: [0, 1, 2], image: null },
       },
       look: { look: "sil", shape: "cube", theme: "custom", backdrop: "graphite", floor: true, colors: DEFAULT_COLORS },
       camera: { distanceCm: 600, spin: null, spinSpeed: 21 },
