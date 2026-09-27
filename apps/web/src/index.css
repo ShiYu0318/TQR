@@ -69,3 +69,11 @@ body {
   }
   .area-bottom { height: auto; }
 }
+
+/* clean view: the eye stays hidden until the pointer moves over the stage */
+.stage.clean .eye-button { opacity: 0; pointer-events: none; }
+.stage.clean.hot .eye-button,
+.stage.clean .eye-button:focus-visible { opacity: 1; pointer-events: auto; }
+@media (prefers-reduced-motion: reduce) {
+  .stage * { transition: none !important; }
+}

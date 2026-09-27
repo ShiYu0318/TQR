@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Header } from "@/components/Header";
-import { Stage } from "@/three/Stage";
+import { StageView } from "@/stage/StageView";
 import { farDistanceCm } from "@/three/geometry";
 import { solve } from "@/lib/solve";
 import { useStudio } from "@/store";
@@ -30,9 +30,7 @@ export function App() {
         <Placeholder title="結構" />
         <Placeholder title="外觀" />
       </aside>
-      <div className="area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square">
-        <Stage />
-      </div>
+      <StageView />
       <aside className="area-right flex min-h-0 flex-col gap-3" aria-label="輸出與分享">
         <Placeholder title="輸出" />
         <Placeholder title="分享與存檔" />

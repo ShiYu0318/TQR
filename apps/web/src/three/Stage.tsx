@@ -1,4 +1,4 @@
-import { Canvas, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { useStudio } from "@/store";
@@ -6,6 +6,13 @@ import { placeholder } from "@/lib/solve";
 import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Sculpture } from "./Sculpture";
+import { publishLive } from "./live";
+
+/** hands the camera to the overlays every frame (see live.ts) */
+function LiveCamera() {
+  useFrame(({ camera }) => publishLive(camera));
+  return null;
+}
 
 // three.js now measures light in physical units; × π gives the old (legacy) brightness the reference app was tuned for
 const LEGACY = Math.PI;
@@ -48,6 +55,7 @@ export function Stage() {
       <Backdrop backdrop={look.backdrop} backlit={model === "sil" && look.look === "sil"} floor={look.floor} model={model} size={size} />
       <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} />
       <CameraRig size={size} minPolar={0.001} maxPolar={Math.PI - 0.001} />
+      <LiveCamera />
     </Canvas>
   );
 }
