@@ -1,7 +1,8 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
 import type { Result } from "@tqr/tri-core";
-import type { Look } from "@/store";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import type { Look, Shape } from "@/store";
 import { cellCentre, occupiedCells, strutBox } from "./geometry";
 import { cellFacts, colourCells } from "./colouring";
 import type { Colors } from "./palette";
@@ -14,16 +15,24 @@ interface Props {
   strutWidth: number;
   look: Look;
   colors: Colors;
+  shape: Shape;
 }
 
 const unit = new THREE.BoxGeometry(1, 1, 1);
+/** cube shapes; cylinders and spheres only touch along lines or points, so they are offered for unconnected sculptures only */
+const SHAPES: Record<Shape, THREE.BufferGeometry> = {
+  cube: unit,
+  rounded: new RoundedBoxGeometry(1, 1, 1, 2, 0.18),
+  cylinder: new THREE.CylinderGeometry(0.5, 0.5, 1, 20),
+  sphere: new THREE.SphereGeometry(0.5, 20, 14),
+};
 /** what a scanner sees: black, unlit */
 export const SILHOUETTE = new THREE.MeshBasicMaterial({ color: 0x000000 });
 const lit = new THREE.MeshLambertMaterial({ color: 0xffffff });
 const strutLit = new THREE.MeshLambertMaterial({ color: 0xc98b2e });
 
 /** The TQR sculpture: one instanced cube per voxel and one thin box per strut, coloured by the look. */
-export function Sculpture({ result, moduleMm, strutWidth, look, colors }: Props) {
+export function Sculpture({ result, moduleMm, strutWidth, look, colors, shape }: Props) {
   const cubes = useRef<THREE.InstancedMesh>(null);
   const struts = useRef<THREE.InstancedMesh>(null);
   const cells = useMemo(() => occupiedCells(result), [result]);
@@ -48,7 +57,7 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors }: Props)
       struts.current.instanceMatrix.needsUpdate = true;
       struts.current.computeBoundingSphere();
     }
-  }, [result, cells, moduleMm, strutWidth]);
+  }, [result, cells, moduleMm, strutWidth, shape]);
 
   useLayoutEffect(() => {
     if (!cubes.current || !struts.current) return;
@@ -64,12 +73,12 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors }: Props)
     const col = new THREE.Color();
     for (let i = 0; i < cells.length; i++) cubes.current.setColorAt(i, col.fromArray(paint.cubes, i * 3));
     if (cubes.current.instanceColor) cubes.current.instanceColor.needsUpdate = true;
-  }, [look, colors, result, cells, facts]);
+  }, [look, colors, result, cells, facts, shape]);
 
   return (
     <group>
       {/* key forces a fresh buffer when the instance count changes */}
-      <instancedMesh key={`c${cells.length}`} ref={cubes} args={[unit, SILHOUETTE, Math.max(1, cells.length)]} />
+      <instancedMesh key={`c${cells.length}${shape}`} ref={cubes} args={[SHAPES[shape], SILHOUETTE, Math.max(1, cells.length)]} />
       <instancedMesh key={`s${result.E.length}`} ref={struts} args={[unit, SILHOUETTE, Math.max(1, result.E.length)]} />
     </group>
   );

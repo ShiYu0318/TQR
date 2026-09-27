@@ -41,6 +41,9 @@ export function Stage() {
   const tileMm = useStudio((s) => s.moduleMm.tile);
   const strut = useStudio((s) => s.design.strut);
   const look = useStudio((s) => s.look);
+  const unconnected = useStudio((s) => s.generatedWith?.method === "free");
+  // cylinders and spheres only for unconnected sculptures (they touch along lines or points)
+  const shape = !unconnected && (look.shape === "cylinder" || look.shape === "sphere") ? "cube" : look.shape;
   const shown = useMemo(() => result ?? placeholder(), [result]);
   const footprint = tileFootprint(tileMm);
   const tile = model === "tile";
@@ -61,7 +64,7 @@ export function Stage() {
       {tile ? (
         <Tile moduleMm={tileMm} dark={look.colors.dark} light={look.colors.light} />
       ) : (
-        <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} />
+        <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} shape={shape} />
       )}
       {/* the tile is never seen from under the table */}
       <CameraRig size={size} minPolar={0.001} maxPolar={tile ? Math.PI / 2 - 0.02 : Math.PI - 0.001} />

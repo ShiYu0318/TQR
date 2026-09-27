@@ -3,6 +3,7 @@ import { generate } from "@/lib/actions";
 import { Note, Panel } from "./Panel";
 import { ContentPanel } from "@/panels/ContentPanel";
 import { StructurePanel } from "@/panels/StructurePanel";
+import { LookPanel } from "@/panels/LookPanel";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -15,9 +16,7 @@ export function LeftSidebar() {
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain [scrollbar-color:var(--color-rule)_transparent] [scrollbar-width:thin] max-[900px]:overflow-visible">
         {sil ? <ContentPanel /> : null}
         <StructurePanel />
-        <Panel id="look" title="外觀" side="left">
-          <Note>（下一步填入）</Note>
-        </Panel>
+        <LookPanel />
         <Panel id="logo" title="中央 Logo" side="left" hidden={!sil}>
           <Note>（下一步填入）</Note>
         </Panel>
