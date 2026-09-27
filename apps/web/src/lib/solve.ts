@@ -5,8 +5,8 @@ import { encodeContent } from "./content";
 import { imageToSide, sideLogoImage } from "./sideLogo";
 import { centerLogoOverlay, logoErrorMessage } from "./centerLogo";
 
-export interface Solved {
-  result: Result;
+export interface Prepared {
+  spec: Spec;
   links: string[];
 }
 
@@ -16,8 +16,11 @@ export function payload(design: Design, i: number): string {
   return encodeContent(c.type, c.fields);
 }
 
-/** Build the solver spec from the design and run it. Throws with a user-facing message on bad input. */
-export function solve(design: Design): Solved {
+/**
+ * Build the solver spec from the design (on the main thread: logos are drawn with a canvas).
+ * Throws with a user-facing message on bad input.
+ */
+export function prepare(design: Design): Prepared {
   const views = design.mode === "3qr" ? 3 : 2;
   const links = Array.from({ length: views }, (_, i) => payload(design, i));
   if (links.some((l) => !l)) throw new Error("請先填好每個方向的內容。");
@@ -43,11 +46,21 @@ export function solve(design: Design): Solved {
   if (design.mode === "2qr_logo") spec.logo = imageToSide(sideLogoImage(design.sideLogo, n), n);
   const L = design.centerLogo;
   if (L.kind !== "none") spec.overlays = spec.qr.map((_, i) => (L.views.includes(i) ? centerLogoOverlay(n, L, i) : null));
+  return { spec, links };
+}
+
+/** the solver's error as a sentence */
+export function solverError(msg: string): string {
+  return logoErrorMessage(msg) ?? `生成失敗：${msg.split("\n")[0]}`;
+}
+
+/** prepare and solve on this thread (tests and the worker-less fallback) */
+export function solve(design: Design): { result: Result; links: string[] } {
+  const { spec, links } = prepare(design);
   try {
     return { result: TRI.generate(spec), links };
   } catch (e) {
-    const msg = (e as Error).message;
-    throw new Error(logoErrorMessage(msg) ?? `生成失敗：${msg.split("\n")[0]}`);
+    throw new Error(solverError((e as Error).message));
   }
 }
 

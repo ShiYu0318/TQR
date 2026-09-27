@@ -10,7 +10,7 @@ import { useStudio } from "@/store";
 // Layout matches reference.html: header on top, settings left and right of the 3D stage,
 // numbers and checks under it.
 export function App() {
-  useEffect(() => generate(), []);
+  useEffect(() => void generate(), []);
   // each model opens on its own view: the sculpture from the front at scanning distance, the tile from the north
   const model = useStudio((s) => s.model);
   useEffect(() => {

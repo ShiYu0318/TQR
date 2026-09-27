@@ -15,6 +15,7 @@ import { Hint } from "./Hint";
 export function StageView() {
   const box = useRef<HTMLDivElement>(null);
   const clean = useStudio((s) => s.clean);
+  const busy = useStudio((s) => s.busy);
   const setClean = useStudio((s) => s.setClean);
   const [fullscreen, setFullscreen] = useState(false);
   const [maxi, setMaxi] = useState(false);
@@ -119,6 +120,11 @@ export function StageView() {
       className={`stage area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square ${clean ? "clean" : ""} ${hot ? "hot" : ""} ${maxi ? "!fixed inset-0 z-50 !rounded-none !border-0" : ""} [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
     >
       <Stage />
+      {busy && (
+        <div className="absolute inset-0 z-[3] flex items-center justify-center bg-[rgba(13,17,23,.65)] font-mono text-sm text-ink" role="status">
+          生成中…
+        </div>
+      )}
       <Hint />
       <ControlBar />
       <RightColumn fullscreen={fullscreen || maxi} onFullscreen={toggleFullscreen} onHide={toggleClean} />
