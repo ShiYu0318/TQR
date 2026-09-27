@@ -1,0 +1,17 @@
+{
+  "name": "@tqr/tri-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Typed ES-module view of the TQR solver in src/js/tri_core.js (no copy of the solver)",
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    "./vite": { "types": "./vite.d.ts", "default": "./vite.js" }
+  },
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "vitest": "^4.1.11"
+  }
+}

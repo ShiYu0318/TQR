@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "test:js": "node tests/jstest.js",
+    "test:unit": "npm test -w @tqr/tri-core",
     "test:e2e": "echo not included",
     "build:extra": "echo not included",
     "dev:web": "npm run dev -w @tqr/web",
