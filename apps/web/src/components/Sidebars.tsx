@@ -5,6 +5,7 @@ import { ContentPanel } from "@/panels/ContentPanel";
 import { StructurePanel } from "@/panels/StructurePanel";
 import { LookPanel } from "@/panels/LookPanel";
 import { CenterLogoPanel } from "@/panels/CenterLogoPanel";
+import { TileContentPanel } from "@/panels/TileContentPanel";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -15,7 +16,7 @@ export function LeftSidebar() {
   return (
     <aside className="area-left flex min-h-0 flex-col" aria-label="設計">
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain [scrollbar-color:var(--color-rule)_transparent] [scrollbar-width:thin] max-[900px]:overflow-visible">
-        {sil ? <ContentPanel /> : null}
+        {sil ? <ContentPanel /> : <TileContentPanel />}
         <StructurePanel />
         <LookPanel />
         {sil && <CenterLogoPanel />}
