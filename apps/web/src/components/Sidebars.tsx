@@ -1,0 +1,61 @@
+import { useStudio } from "@/store";
+import { generate } from "@/lib/actions";
+import { Note, Panel } from "./Panel";
+
+/** Left column: design panels that scroll, and the one main action pinned below them. */
+export function LeftSidebar() {
+  const model = useStudio((s) => s.model);
+  const busy = useStudio((s) => s.busy);
+  const message = useStudio((s) => s.message);
+  const sil = model === "sil";
+  return (
+    <aside className="area-left flex min-h-0 flex-col" aria-label="設計">
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain [scrollbar-color:var(--color-rule)_transparent] [scrollbar-width:thin] max-[900px]:overflow-visible">
+        <Panel id="content" title="內容" side="left">
+          <Note>（下一步填入）</Note>
+        </Panel>
+        <Panel id="structure" title="結構" side="left">
+          <Note>（下一步填入）</Note>
+        </Panel>
+        <Panel id="look" title="外觀" side="left">
+          <Note>（下一步填入）</Note>
+        </Panel>
+        <Panel id="logo" title="中央 Logo" side="left" hidden={!sil}>
+          <Note>（下一步填入）</Note>
+        </Panel>
+      </div>
+      {sil && (
+        <div className="flex flex-none flex-col gap-1.5 pt-3" id="genActions">
+          {message && (
+            <p className="m-0 text-xs leading-snug text-warn" role="status">
+              {message}
+            </p>
+          )}
+          <button
+            type="button"
+            id="gen"
+            disabled={busy}
+            onClick={generate}
+            className="w-full cursor-pointer rounded-lg border border-accent bg-accent px-2.5 py-[11px] text-[15px] font-bold tracking-[.06em] text-accent-ink disabled:cursor-wait disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            生成
+          </button>
+        </div>
+      )}
+    </aside>
+  );
+}
+
+/** Right column: output and sharing. */
+export function RightSidebar() {
+  return (
+    <aside className="area-right flex min-h-0 flex-col gap-3 overflow-y-auto [scrollbar-width:thin]" aria-label="輸出與分享">
+      <Panel id="output" title="輸出" side="right">
+        <Note>（匯出時填入）</Note>
+      </Panel>
+      <Panel id="share" title="分享與存檔" side="right">
+        <Note>（分享時填入）</Note>
+      </Panel>
+    </aside>
+  );
+}
