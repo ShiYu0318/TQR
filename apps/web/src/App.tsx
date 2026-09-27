@@ -1,8 +1,27 @@
+import { useEffect } from "react";
 import { Header } from "@/components/Header";
+import { Stage } from "@/three/Stage";
+import { farDistanceCm } from "@/three/geometry";
+import { solve } from "@/lib/solve";
+import { useStudio } from "@/store";
+
+/** Run the solver on the current design and frame the result (the worker version comes later). */
+export function generate() {
+  const { design, moduleMm, setResult, setBusy, requestView } = useStudio.getState();
+  try {
+    const { result, links } = solve(design);
+    setResult(result, links);
+    setBusy(false);
+    requestView(0, 0, farDistanceCm(result.n, moduleMm.sil));
+  } catch (e) {
+    setBusy(false, (e as Error).message);
+  }
+}
 
 // Layout matches reference.html: header on top, settings left and right of the 3D stage,
 // numbers and checks under it. Areas are filled in by the following steps.
 export function App() {
+  useEffect(() => generate(), []);
   return (
     <div className="app">
       <Header />
@@ -11,7 +30,9 @@ export function App() {
         <Placeholder title="結構" />
         <Placeholder title="外觀" />
       </aside>
-      <div className="area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square" />
+      <div className="area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square">
+        <Stage />
+      </div>
       <aside className="area-right flex min-h-0 flex-col gap-3" aria-label="輸出與分享">
         <Placeholder title="輸出" />
         <Placeholder title="分享與存檔" />

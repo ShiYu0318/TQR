@@ -35,9 +35,15 @@ export interface Look3D {
   floor: boolean;
 }
 
-export interface Camera {
+/** a one-off jump of the camera; id changes on every request so the rig reacts once */
+export interface ViewRequest {
   azimuth: number;
   elevation: number;
+  distanceCm?: number;
+  id: number;
+}
+
+export interface Camera {
   distanceCm: number;
   spin: "v" | "h" | "free" | null;
   /** degrees per second */
@@ -55,6 +61,11 @@ interface State {
   look: Look3D;
   camera: Camera;
   result: Result | null;
+  /** the text each generated view encodes */
+  links: string[];
+  /** physical module size in mm, per model */
+  moduleMm: Record<Model, number>;
+  viewRequest: ViewRequest;
   busy: boolean;
   message: string;
   /** links that have lit since the last reset, per model */
@@ -67,7 +78,8 @@ interface State {
   setDesign(patch: Partial<Design>): void;
   setLook(patch: Partial<Look3D>): void;
   setCamera(patch: Partial<Camera>): void;
-  setResult(result: Result | null): void;
+  setResult(result: Result | null, links?: string[]): void;
+  requestView(azimuth: number, elevation: number, distanceCm?: number): void;
   setBusy(busy: boolean, message?: string): void;
   markFound(model: Model, key: string): void;
   resetFound(model: Model): void;
@@ -93,8 +105,11 @@ export const useStudio = create<State>()(
         strut: 20,
       },
       look: { look: "sil", shape: "cube", theme: "custom", backdrop: "graphite", floor: true },
-      camera: { azimuth: 0, elevation: 0, distanceCm: 600, spin: null, spinSpeed: 21 },
+      camera: { distanceCm: 600, spin: null, spinSpeed: 21 },
       result: null,
+      links: [],
+      moduleMm: { sil: 3, tile: 5 },
+      viewRequest: { azimuth: 0, elevation: 0, distanceCm: 600, id: 0 },
       busy: false,
       message: "",
       found: { sil: [], tile: [] },
@@ -106,7 +121,9 @@ export const useStudio = create<State>()(
       setDesign: (patch) => set((s) => ({ design: { ...s.design, ...patch } })),
       setLook: (patch) => set((s) => ({ look: { ...s.look, ...patch } })),
       setCamera: (patch) => set((s) => ({ camera: { ...s.camera, ...patch } })),
-      setResult: (result) => set({ result }),
+      setResult: (result, links = []) => set({ result, links }),
+      requestView: (azimuth, elevation, distanceCm) =>
+        set((s) => ({ viewRequest: { azimuth, elevation, distanceCm, id: s.viewRequest.id + 1 } })),
       setBusy: (busy, message = "") => set({ busy, message }),
       markFound: (model, key) =>
         set((s) => (s.found[model].includes(key) ? s : { found: { ...s.found, [model]: [...s.found[model], key] } })),
