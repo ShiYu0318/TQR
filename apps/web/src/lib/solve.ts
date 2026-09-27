@@ -1,15 +1,18 @@
 import TRI, { type Result, type Spec } from "@tqr/tri-core";
 import type { Design } from "@/store";
 import { qrMatrix, qrVersion } from "./qr";
+import { encodeContent } from "./content";
+import { imageToSide, sideLogoImage } from "./sideLogo";
 
 export interface Solved {
   result: Result;
   links: string[];
 }
 
-/** the text a view's content encodes (only plain links until the content editor lands) */
+/** the text a view's content encodes */
 export function payload(design: Design, i: number): string {
-  return design.content[i].fields.url ?? "";
+  const c = design.content[i];
+  return encodeContent(c.type, c.fields);
 }
 
 /** Build the solver spec from the design and run it. Throws with a user-facing message on bad input. */
@@ -33,7 +36,10 @@ export function solve(design: Design): Solved {
     method: design.method,
     relaxed: design.relaxed && design.method.startsWith("bridge"),
     budget: design.budget / 100,
+    logoBudget: design.sideLogo.budget / 100,
   };
+  const n = 17 + 4 * version;
+  if (design.mode === "2qr_logo") spec.logo = imageToSide(sideLogoImage(design.sideLogo, n), n);
   return { result: TRI.generate(spec), links };
 }
 

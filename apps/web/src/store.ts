@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Level, Method, Mode, Result } from "@tqr/tri-core";
 import { DEFAULT_COLORS, type Colors } from "@/three/palette";
+import type { Values } from "@/lib/content";
+import type { SideLogo } from "@/lib/sideLogo";
 
 export type Lang = "zh" | "en";
 export type Model = "sil" | "tile";
@@ -11,7 +13,7 @@ export type Shape = "cube" | "rounded" | "cylinder" | "sphere";
 /** one view's content: a content type (url, wifi, vcard, ...) and its fields */
 export interface Content {
   type: string;
-  fields: Record<string, string>;
+  fields: Values;
 }
 
 export interface Design {
@@ -26,6 +28,8 @@ export interface Design {
   budget: number;
   /** strut width as a share of a module, in % */
   strut: number;
+  /** the side picture of "2 QR + logo" */
+  sideLogo: SideLogo;
 }
 
 export interface Look3D {
@@ -78,6 +82,7 @@ interface State {
   setPanel(id: string, open: boolean): void;
   setClean(clean: boolean): void;
   setDesign(patch: Partial<Design>): void;
+  setContent(i: number, content: Content): void;
   setLook(patch: Partial<Look3D>): void;
   setCamera(patch: Partial<Camera>): void;
   setResult(result: Result | null, links?: string[]): void;
@@ -105,6 +110,7 @@ export const useStudio = create<State>()(
         relaxed: false,
         budget: 50,
         strut: 20,
+        sideLogo: { kind: "heart", text: "NCU", badge: true, budget: 10 },
       },
       look: { look: "sil", shape: "cube", theme: "custom", backdrop: "graphite", floor: true, colors: DEFAULT_COLORS },
       camera: { distanceCm: 600, spin: null, spinSpeed: 21 },
@@ -121,6 +127,12 @@ export const useStudio = create<State>()(
       setPanel: (id, open) => set((s) => ({ panels: { ...s.panels, [id]: open } })),
       setClean: (clean) => set({ clean }),
       setDesign: (patch) => set((s) => ({ design: { ...s.design, ...patch } })),
+      setContent: (i, content) =>
+        set((s) => {
+          const next = [...s.design.content] as Design["content"];
+          next[i] = content;
+          return { design: { ...s.design, content: next } };
+        }),
       setLook: (patch) => set((s) => ({ look: { ...s.look, ...patch } })),
       setCamera: (patch) => set((s) => ({ camera: { ...s.camera, ...patch } })),
       setResult: (result, links = []) => set({ result, links }),

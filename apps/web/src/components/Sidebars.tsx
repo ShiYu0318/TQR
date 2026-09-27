@@ -1,6 +1,7 @@
 import { useStudio } from "@/store";
 import { generate } from "@/lib/actions";
 import { Note, Panel } from "./Panel";
+import { ContentPanel } from "@/panels/ContentPanel";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -11,9 +12,7 @@ export function LeftSidebar() {
   return (
     <aside className="area-left flex min-h-0 flex-col" aria-label="設計">
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain [scrollbar-color:var(--color-rule)_transparent] [scrollbar-width:thin] max-[900px]:overflow-visible">
-        <Panel id="content" title="內容" side="left">
-          <Note>（下一步填入）</Note>
-        </Panel>
+        {sil ? <ContentPanel /> : null}
         <Panel id="structure" title="結構" side="left">
           <Note>（下一步填入）</Note>
         </Panel>
