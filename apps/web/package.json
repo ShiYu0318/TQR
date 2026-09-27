@@ -1,0 +1,25 @@
+{
+  "name": "@tqr/web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "TQR Studio as a web app (Vite + React + TypeScript)",
+  "scripts": {
+    "dev": "vite",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit -p . && tsc --noEmit -p tsconfig.node.json"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.1",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.1"
+  }
+}

@@ -2,11 +2,17 @@
   "name": "tqr",
   "version": "0.1.0",
   "private": true,
-  "description": "Multi-view QR sculptures: JS solver tests and browser tests",
+  "description": "Multi-view QR sculptures: JS solver tests, browser tests, and the TQR Studio web app",
+  "workspaces": [
+    "apps/web",
+    "packages/*"
+  ],
   "scripts": {
     "test:js": "node tests/jstest.js",
     "test:e2e": "echo not included",
-    "build:extra": "echo not included"
+    "build:extra": "echo not included",
+    "dev:web": "npm run dev -w @tqr/web",
+    "build:web": "npm run build -w @tqr/web"
   },
   "devDependencies": {
     "@zxing/library": "0.21.3",
