@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Level, Method, Mode, Result } from "@tqr/tri-core";
+import { DEFAULT_COLORS, type Colors } from "@/three/palette";
 
 export type Lang = "zh" | "en";
 export type Model = "sil" | "tile";
@@ -33,6 +34,7 @@ export interface Look3D {
   theme: string;
   backdrop: string;
   floor: boolean;
+  colors: Colors;
 }
 
 /** a one-off jump of the camera; id changes on every request so the rig reacts once */
@@ -104,7 +106,7 @@ export const useStudio = create<State>()(
         budget: 50,
         strut: 20,
       },
-      look: { look: "sil", shape: "cube", theme: "custom", backdrop: "graphite", floor: true },
+      look: { look: "sil", shape: "cube", theme: "custom", backdrop: "graphite", floor: true, colors: DEFAULT_COLORS },
       camera: { distanceCm: 600, spin: null, spinSpeed: 21 },
       result: null,
       links: [],
