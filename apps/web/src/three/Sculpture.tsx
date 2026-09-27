@@ -78,8 +78,8 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors, shape }:
   return (
     <group>
       {/* key forces a fresh buffer when the instance count changes */}
-      <instancedMesh key={`c${cells.length}${shape}`} ref={cubes} args={[SHAPES[shape], SILHOUETTE, Math.max(1, cells.length)]} />
-      <instancedMesh key={`s${result.E.length}`} ref={struts} args={[unit, SILHOUETTE, Math.max(1, result.E.length)]} />
+      <instancedMesh name="cubes" key={`c${cells.length}${shape}`} ref={cubes} args={[SHAPES[shape], SILHOUETTE, Math.max(1, cells.length)]} />
+      <instancedMesh name="struts" key={`s${result.E.length}`} ref={struts} args={[unit, SILHOUETTE, Math.max(1, result.E.length)]} />
     </group>
   );
 }

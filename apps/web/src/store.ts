@@ -52,6 +52,17 @@ export interface ViewRequest {
   id: number;
 }
 
+/** what the latest scan of the view read */
+export interface Scan {
+  /** false until the first scan has run */
+  ready: boolean;
+  text: string | null;
+  /** the link of this model it matched, if any */
+  key: string | null;
+  /** why it did not read one of this model's links */
+  reason: string;
+}
+
 export interface Camera {
   distanceCm: number;
   spin: "v" | "h" | "free" | null;
@@ -79,6 +90,7 @@ interface State {
   viewRequest: ViewRequest;
   busy: boolean;
   message: string;
+  scan: Scan;
   /** links that have lit since the last reset, per model */
   found: Record<Model, string[]>;
 
@@ -93,6 +105,7 @@ interface State {
   setResult(result: Result | null, links?: string[], design?: Design | null): void;
   requestView(azimuth: number, elevation: number, distanceCm?: number): void;
   setBusy(busy: boolean, message?: string): void;
+  setScan(scan: Scan): void;
   markFound(model: Model, key: string): void;
   resetFound(model: Model): void;
 }
@@ -127,6 +140,7 @@ export const useStudio = create<State>()(
       viewRequest: { azimuth: 0, elevation: 0, distanceCm: 600, id: 0 },
       busy: false,
       message: "",
+      scan: { ready: false, text: null, key: null, reason: "" },
       found: { sil: [], tile: [] },
 
       setLang: (lang) => set({ lang }),
@@ -146,6 +160,7 @@ export const useStudio = create<State>()(
       requestView: (azimuth, elevation, distanceCm) =>
         set((s) => ({ viewRequest: { azimuth, elevation, distanceCm, id: s.viewRequest.id + 1 } })),
       setBusy: (busy, message = "") => set({ busy, message }),
+      setScan: (scan) => set({ scan }),
       markFound: (model, key) =>
         set((s) => (s.found[model].includes(key) ? s : { found: { ...s.found, [model]: [...s.found[model], key] } })),
       resetFound: (model) => set((s) => ({ found: { ...s.found, [model]: [] } })),

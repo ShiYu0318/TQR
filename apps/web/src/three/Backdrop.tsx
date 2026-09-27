@@ -134,7 +134,7 @@ export function Backdrop({ backdrop, backlit, floor, model, size, footprint }: P
   if (backlit || !floor) return null;
   const [W, Dp] = footprint, tile = model === "tile";
   return (
-    <group ref={group}>
+    <group ref={group} name="studio">
       <mesh ref={floorMesh} rotation-x={-Math.PI / 2} scale={tile ? [W * 3.2, W * 3.2, 1] : [S * 4, S * 4, 1]} renderOrder={-2}>
         <planeGeometry />
         <meshBasicMaterial map={floorMap} transparent depthWrite={false} />

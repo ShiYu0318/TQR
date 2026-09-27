@@ -5,6 +5,8 @@ import { cmToSlider, sliderToCm } from "@/three/live";
 import { RightColumn } from "./RightColumn";
 import { ControlBar } from "./ControlBar";
 import { Hint } from "./Hint";
+import { live, subscribeLive } from "@/three/live";
+import { scheduleScan } from "@/lib/scan";
 
 /**
  * The 3D view with its overlays. Owns three behaviours of the stage as a whole:
@@ -49,6 +51,20 @@ export function StageView() {
       setHot(false); // hiding clears the eye straight away
     }
   };
+
+  // ---- scanning: once the view settles (or often, lightly, while it spins), and whenever the model or look changes
+  useEffect(() => {
+    let last = "";
+    return subscribeLive(() => {
+      const s = useStudio.getState(), key = live.dir.toArray().map((v) => v.toFixed(4)).join() + s.camera.distanceCm;
+      if (key === last) return;
+      last = key;
+      if (s.camera.spin) scheduleScan(150, true);
+      else scheduleScan(220);
+    });
+  }, []);
+  const result = useStudio((s) => s.result), model = useStudio((s) => s.model), lookName = useStudio((s) => s.look.look);
+  useEffect(() => scheduleScan(120), [result, model, lookName]);
 
   // ---- full screen
   useEffect(() => {

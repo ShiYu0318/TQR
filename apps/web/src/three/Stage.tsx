@@ -9,6 +9,7 @@ import { Sculpture } from "./Sculpture";
 import { Tile, tileFootprint } from "./Tile";
 import { publishLive } from "./live";
 import { SpinDriver } from "./SpinDriver";
+import { Scanner } from "./Scanner";
 
 /** hands the camera to the overlays every frame (see live.ts) */
 function LiveCamera() {
@@ -69,6 +70,7 @@ export function Stage() {
       {/* the tile is never seen from under the table */}
       <CameraRig size={size} minPolar={0.001} maxPolar={tile ? Math.PI / 2 - 0.02 : Math.PI - 0.001} />
       <SpinDriver />
+      <Scanner backlitForScan={model === "sil" && look.look !== "sil"} />
       <LiveCamera />
     </Canvas>
   );
