@@ -1,0 +1,71 @@
+@import "tailwindcss";
+
+/* GitHub-dark tokens, the same values as reference.html */
+@theme {
+  --color-bg: #0d1117;
+  --color-panel: #161b22;
+  --color-sunk: #010409;
+  --color-ink: #e6edf3;
+  --color-muted: #8b949e;
+  --color-rule: #30363d;
+  --color-accent: #4493f8;
+  --color-accent-ink: #0d1117;
+  --color-warn: #d29922;
+  --color-bad: #f85149;
+  --font-display: "Bricolage Grotesque", "Noto Sans TC", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Noto Sans TC", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  overflow: hidden;
+  padding-inline: 16px;
+  padding-block: 12px;
+}
+
+/* one-screen layout: title on top, controls left and right of the 3D stage, numbers and checks below */
+.app {
+  height: 100%;
+  max-width: 1680px;
+  margin: 0 auto;
+  display: grid;
+  gap: 12px 14px;
+  grid-template-columns: 320px minmax(0, 1fr) 300px;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top top top" "left stage right" "left bottom right";
+}
+.area-top { grid-area: top; }
+.area-left { grid-area: left; }
+.area-stage { grid-area: stage; }
+.area-right { grid-area: right; }
+.area-bottom { grid-area: bottom; height: 198px; }
+@media (min-width: 1400px) {
+  .area-bottom { height: 168px; }
+}
+@media (max-width: 900px) {
+  body { overflow: visible; padding-block: 20px 32px; }
+  html, body, #root { height: auto; }
+  .app {
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-template-areas: "top" "stage" "bottom" "left" "right";
+  }
+  .area-bottom { height: auto; }
+}
