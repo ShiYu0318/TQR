@@ -7,6 +7,7 @@ import { Backdrop } from "./Backdrop";
 import { CameraRig } from "./CameraRig";
 import { Sculpture } from "./Sculpture";
 import { publishLive } from "./live";
+import { SpinDriver } from "./SpinDriver";
 
 /** hands the camera to the overlays every frame (see live.ts) */
 function LiveCamera() {
@@ -55,6 +56,7 @@ export function Stage() {
       <Backdrop backdrop={look.backdrop} backlit={model === "sil" && look.look === "sil"} floor={look.floor} model={model} size={size} />
       <Sculpture result={shown} moduleMm={moduleMm} strutWidth={strut / 100} look={look.look} colors={look.colors} />
       <CameraRig size={size} minPolar={0.001} maxPolar={Math.PI - 0.001} />
+      <SpinDriver />
       <LiveCamera />
     </Canvas>
   );

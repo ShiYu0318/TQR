@@ -31,6 +31,7 @@ export function CameraRig({ size, minPolar, maxPolar }: Props) {
   const distanceCm = useStudio((s) => s.camera.distanceCm);
   const request = useStudio((s) => s.viewRequest);
   const setCamera = useStudio((s) => s.setCamera);
+  const spinning = useStudio((s) => s.camera.spin !== null);
   const applied = useRef(-1);
 
   useEffect(() => {
@@ -59,6 +60,7 @@ export function CameraRig({ size, minPolar, maxPolar }: Props) {
     <OrbitControls
       ref={controls}
       makeDefault
+      enabled={!spinning}
       enablePan={false}
       enableZoom={false}
       enableDamping

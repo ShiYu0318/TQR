@@ -3,6 +3,8 @@ import { useStudio } from "@/store";
 import { Stage } from "@/three/Stage";
 import { cmToSlider, sliderToCm } from "@/three/live";
 import { RightColumn } from "./RightColumn";
+import { ControlBar } from "./ControlBar";
+import { Hint } from "./Hint";
 
 /**
  * The 3D view with its overlays. Owns three behaviours of the stage as a whole:
@@ -113,9 +115,12 @@ export function StageView() {
       id="stage"
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
+      onPointerDown={(e) => e.target instanceof HTMLCanvasElement && !(e.target as HTMLElement).closest('[role=img]') && useStudio.getState().setCamera({ spin: null })}
       className={`stage area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square ${clean ? "clean" : ""} ${hot ? "hot" : ""} ${maxi ? "!fixed inset-0 z-50 !rounded-none !border-0" : ""} [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
     >
       <Stage />
+      <Hint />
+      <ControlBar />
       <RightColumn fullscreen={fullscreen || maxi} onFullscreen={toggleFullscreen} onHide={toggleClean} />
     </div>
   );
