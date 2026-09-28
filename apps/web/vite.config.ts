@@ -2,10 +2,48 @@ import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import { triCore } from "@tqr/tri-core/vite";
+import { VitePWA } from "vite-plugin-pwa";
 import { fileURLToPath, URL } from "node:url";
 
 export default defineConfig({
-  plugins: [triCore(), react(), tailwind()],
+  plugins: [
+    triCore(),
+    react(),
+    tailwind(),
+    // installable and offline: every built file (solver, workers, both wasm modules) is precached
+    VitePWA({
+      registerType: "autoUpdate",
+      manifest: {
+        name: "TQR Studio",
+        short_name: "TQR Studio",
+        description: "多視角 QR 設計工作室：設計從不同方向看是不同 QR 碼的實體模型。",
+        lang: "zh-Hant",
+        start_url: ".",
+        display: "standalone",
+        background_color: "#0d1117",
+        theme_color: "#0d1117",
+        icons: [
+          { src: "icon-192.png", sizes: "192x192", type: "image/png" },
+          { src: "icon-512.png", sizes: "512x512", type: "image/png" },
+          { src: "icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "icon.svg", sizes: "any", type: "image/svg+xml" },
+        ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{js,css,html,wasm,svg,png}"],
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
+        // share links carry the design in the hash, so every navigation is the app shell
+        navigateFallback: "index.html",
+        runtimeCaching: [
+          {
+            urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\/.*/,
+            handler: "StaleWhileRevalidate",
+            options: { cacheName: "fonts", expiration: { maxEntries: 30, maxAgeSeconds: 365 * 24 * 3600 } },
+          },
+        ],
+      },
+    }),
+  ],
   // the solver worker imports the solver too
   worker: { format: "es", plugins: () => [triCore()] },
   // one three.js: drei helpers hoisted to the root would otherwise pick up the root devDependency (0.147)
