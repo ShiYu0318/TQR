@@ -13,7 +13,8 @@
     "test:e2e": "echo not included",
     "build:extra": "echo not included",
     "dev:web": "npm run dev -w @tqr/web",
-    "build:web": "npm run build -w @tqr/web"
+    "build:web": "npm run build -w @tqr/web",
+    "build:demo": "npm run build:demo -w @tqr/web"
   },
   "devDependencies": {
     "@zxing/library": "0.21.3",

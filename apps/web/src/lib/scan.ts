@@ -4,12 +4,13 @@ import { useStudio } from "@/store";
 import { captureScan } from "@/three/Scanner";
 import { live } from "@/three/live";
 import { TILE } from "./tile";
+import { spawnScanner } from "@/lib/spawn";
 
 let worker: Comlink.Remote<ScanApi> | null = null;
 let timer = 0;
 
 function scanWorker() {
-  worker ??= Comlink.wrap<ScanApi>(new Worker(new URL("../workers/scan.worker.ts", import.meta.url), { type: "module" }));
+  worker ??= Comlink.wrap<ScanApi>(spawnScanner());
   return worker;
 }
 
