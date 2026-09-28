@@ -6,6 +6,7 @@ import { StructurePanel } from "@/panels/StructurePanel";
 import { LookPanel } from "@/panels/LookPanel";
 import { CenterLogoPanel } from "@/panels/CenterLogoPanel";
 import { TileContentPanel } from "@/panels/TileContentPanel";
+import { OutputPanel } from "@/panels/OutputPanel";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -47,9 +48,7 @@ export function LeftSidebar() {
 export function RightSidebar() {
   return (
     <aside className="area-right flex min-h-0 flex-col gap-3 overflow-y-auto [scrollbar-width:thin]" aria-label="輸出與分享">
-      <Panel id="output" title="輸出" side="right">
-        <Note>（匯出時填入）</Note>
-      </Panel>
+      <OutputPanel />
       <Panel id="share" title="分享與存檔" side="right">
         <Note>（分享時填入）</Note>
       </Panel>

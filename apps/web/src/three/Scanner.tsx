@@ -5,6 +5,8 @@ import { SILHOUETTE } from "./Sculpture";
 
 /** renders the frame a scanner would see and returns its pixels; set by <Scanner/> while the canvas lives */
 export let captureScan: (() => ImageData) | null = null;
+/** the view exactly as on screen, as a PNG; set by <Scanner/> while the canvas lives */
+export let captureView: (() => Promise<Blob>) | null = null;
 
 const WHITE = new THREE.Color(0xffffff);
 const MIN_WIDTH = 900; // rendered frames below ~900 px wide decode poorly
@@ -45,8 +47,13 @@ export function Scanner({ backlitForScan }: { backlitForScan: boolean }) {
       for (let y = 0; y < h; y++) flipped.set(buffer.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4); // GL rows run bottom-up
       return new ImageData(new Uint8ClampedArray(flipped), w, h);
     };
+    captureView = () => {
+      gl.render(scene, camera);
+      return new Promise((res, rej) => gl.domElement.toBlob((b) => (b ? res(b) : rej(new Error("toBlob failed"))), "image/png"));
+    };
     return () => {
       captureScan = null;
+      captureView = null;
       target.dispose();
     };
   }, [gl, scene, camera, size, backlitForScan]);

@@ -102,6 +102,7 @@ interface State {
   setContent(i: number, content: Content): void;
   setLook(patch: Partial<Look3D>): void;
   setCamera(patch: Partial<Camera>): void;
+  setModuleMm(model: Model, mm: number): void;
   setResult(result: Result | null, links?: string[], design?: Design | null): void;
   requestView(azimuth: number, elevation: number, distanceCm?: number): void;
   setBusy(busy: boolean, message?: string): void;
@@ -156,6 +157,7 @@ export const useStudio = create<State>()(
         }),
       setLook: (patch) => set((s) => ({ look: { ...s.look, ...patch } })),
       setCamera: (patch) => set((s) => ({ camera: { ...s.camera, ...patch } })),
+      setModuleMm: (model, mm) => set((s) => ({ moduleMm: { ...s.moduleMm, [model]: Math.max(1, Math.min(20, mm)) } })),
       setResult: (result, links = [], design = null) => set({ result, links, generatedWith: design }),
       requestView: (azimuth, elevation, distanceCm) =>
         set((s) => ({ viewRequest: { azimuth, elevation, distanceCm, id: s.viewRequest.id + 1 } })),
