@@ -1,6 +1,8 @@
 import { useStudio } from "@/store";
 import { Segmented } from "./Segmented";
 import { useT } from "@/i18n";
+import mark from "../../../../assets/brand/logo.svg";
+import wordmark from "../../../../assets/brand/wordmark-on-dark.svg";
 
 const MODEL_NOTE = {
   sil: "背光看剪影。上、前、側三個方向各一個碼（或 Logo），對面看到的是鏡像。需要把相機拉遠，數公尺外用長焦掃。",
@@ -16,8 +18,12 @@ export function Header() {
   return (
     <header className="area-top grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-3.5 gap-y-2 max-[900px]:grid-cols-1">
       <div className="flex min-w-0 flex-col gap-0.5">
-        <h1 className="m-0 font-display text-[22px] leading-tight tracking-tight text-balance">
-          TQR Studio <small className="ml-1.5 font-body text-sm font-medium tracking-normal text-muted">{t("多視角 QR 設計工作室")}</small>
+        <h1 className="m-0 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-display text-[22px] leading-tight tracking-tight">
+          <img src={mark} alt="" width={36} height={36} className="flex-none" />
+          {/* 27 px = 9 modules of 3 px, so the pixel letters stay sharp; the Q's tail hangs below the caps */}
+          <img src={wordmark} alt="TQR" width={57} height={27} className="flex-none translate-y-[3px] [image-rendering:pixelated]" />
+          <span className="font-medium text-muted">Studio</span>
+          <small className="font-body text-sm font-medium tracking-normal text-muted">{t("多視角 QR 設計工作室")}</small>
         </h1>
         <p className="m-0 text-sm text-muted">
           <span>{t("拖曳旋轉模型。畫面停下來時，瀏覽器會讀一次目前的畫面，告訴你這個角度掃得到哪個連結。剪影雕塑可以輸入任何連結即時產生，並切換各種連接方式比較。")}</span>{" "}
