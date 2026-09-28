@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import * as THREE from "three";
 import { useStudio, type Model } from "@/store";
 import { VIEW_TOL, dirOf, live, subscribeLive } from "@/three/live";
+import { t } from "@/i18n";
 
 const S = 88, C = S / 2, R = 30;
 const LETTER: Record<string, string> = { 上: "U", 下: "D", 前: "F", 後: "B", 左: "L", 右: "R", 北: "N", 南: "S", 東: "E", 西: "W" };
@@ -181,8 +182,8 @@ export function Gizmo() {
       width={S}
       height={S}
       role="img"
-      aria-label="三軸方向儀：點一個軸的端點切換到那個方向"
-      title="點一個軸的端點切換到那個方向"
+      aria-label={t("三軸方向儀：點一個軸的端點切換到那個方向")}
+      title={t("點一個軸的端點切換到那個方向")}
       className="size-[88px] self-center touch-none"
     />
   );

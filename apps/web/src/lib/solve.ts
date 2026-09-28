@@ -4,6 +4,7 @@ import { qrMatrix, qrVersion } from "./qr";
 import { encodeContent } from "./content";
 import { imageToSide, sideLogoImage } from "./sideLogo";
 import { centerLogoOverlay, logoErrorMessage } from "./centerLogo";
+import { t } from "@/i18n";
 
 export interface Prepared {
   spec: Spec;
@@ -23,14 +24,14 @@ export function payload(design: Design, i: number): string {
 export function prepare(design: Design): Prepared {
   const views = design.mode === "3qr" ? 3 : 2;
   const links = Array.from({ length: views }, (_, i) => payload(design, i));
-  if (links.some((l) => !l)) throw new Error("請先填好每個方向的內容。");
+  if (links.some((l) => !l)) throw new Error(t("請先填好每個方向的內容。"));
   let version: number;
   try {
     version = Math.max(...links.map((l) => qrVersion(l, design.level)));
   } catch {
-    throw new Error("有連結太長，超過 QR 最高版本的容量。請改用短網址。");
+    throw new Error(t("有連結太長，超過 QR 最高版本的容量。請改用短網址。"));
   }
-  if (design.version && design.version < version) throw new Error(`內容需要至少版本 ${version}，請選更大的版本或改用自動。`);
+  if (design.version && design.version < version) throw new Error(t("內容需要至少版本 {v}，請選更大的版本或改用自動。", { v: version }));
   if (design.version) version = design.version;
   const spec: Spec = {
     qr: links.map((l) => qrMatrix(l, version, design.level)),
@@ -51,7 +52,7 @@ export function prepare(design: Design): Prepared {
 
 /** the solver's error as a sentence */
 export function solverError(msg: string): string {
-  return logoErrorMessage(msg) ?? `生成失敗：${msg.split("\n")[0]}`;
+  return logoErrorMessage(msg) ?? t("生成失敗：{e}", { e: msg.split("\n")[0] });
 }
 
 /** prepare and solve on this thread (tests and the worker-less fallback) */

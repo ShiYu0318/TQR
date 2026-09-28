@@ -1,4 +1,5 @@
 import { useStudio } from "@/store";
+import { useT } from "@/i18n";
 
 /**
  * Centred along the top edge; speaks only when there is nothing of this model to scan here: no model yet, still
@@ -10,12 +11,13 @@ export function Hint() {
   const result = useStudio((s) => s.result);
   const scan = useStudio((s) => s.scan);
   const clean = useStudio((s) => s.clean);
+  const t = useT();
   let main: string, sub: string;
-  if (model === "sil" && !result) (main = "還沒有模型"), (sub = "填好各方向的內容後按「生成」");
-  else if (!scan.ready) (main = "讀取中…"), (sub = "");
+  if (model === "sil" && !result) (main = t("還沒有模型")), (sub = t("填好各方向的內容後按「生成」"));
+  else if (!scan.ready) (main = t("讀取中…")), (sub = "");
   else if (scan.key) return null;
-  else if (scan.text) (main = scan.text), (sub = scan.reason);
-  else (main = "這個角度沒有解出碼"), (sub = scan.reason);
+  else if (scan.text) (main = scan.text), (sub = t(scan.reason));
+  else (main = t("這個角度沒有解出碼")), (sub = t(scan.reason));
   return (
     <div
       aria-hidden="true"

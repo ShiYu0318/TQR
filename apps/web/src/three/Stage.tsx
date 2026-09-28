@@ -10,6 +10,7 @@ import { Tile, tileFootprint } from "./Tile";
 import { publishLive } from "./live";
 import { SpinDriver } from "./SpinDriver";
 import { Scanner } from "./Scanner";
+import { useT } from "@/i18n";
 
 /** hands the camera to the overlays every frame (see live.ts) */
 function LiveCamera() {
@@ -36,6 +37,7 @@ function HeadLight() {
 
 /** The 3D view. Lengths are in mm. */
 export function Stage() {
+  const t = useT();
   const result = useStudio((s) => s.result);
   const model = useStudio((s) => s.model);
   const moduleMm = useStudio((s) => s.moduleMm.sil);
@@ -56,7 +58,7 @@ export function Stage() {
       gl={{ antialias: true, preserveDrawingBuffer: true }}
       dpr={[1, 3]}
       camera={{ position: [0, 0, -6000], fov: 1, near: 1, far: 10000 }}
-      aria-label="可拖曳旋轉的 3D 模型"
+      aria-label={t("可拖曳旋轉的 3D 模型")}
     >
       <hemisphereLight args={[0xffffff, 0x55605a, 0.55 * LEGACY]} />
       <directionalLight position={[0.3, 1, -0.2]} intensity={0.55 * LEGACY} />

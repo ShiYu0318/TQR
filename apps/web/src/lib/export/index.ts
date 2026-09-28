@@ -5,6 +5,7 @@ import { cellFacts } from "@/three/colouring";
 import { farDistanceCm, occupiedCells } from "@/three/geometry";
 import { captureView } from "@/three/Scanner";
 import { TILE } from "@/lib/tile";
+import { t } from "@/i18n";
 import { objText, saveBlob, stlBinary, threeMF } from "./formats";
 import { sculptureParts, setManifoldWasm, tileParts, unionBoxes, type Part } from "./mesh";
 import { silhouetteImage, silhouettePng, silhouetteSvg } from "./twoD";
@@ -33,7 +34,7 @@ export interface ExportOptions {
 
 export class NoModel extends Error {
   constructor() {
-    super("請先產生模型。");
+    super(t("請先產生模型。"));
   }
 }
 
@@ -48,11 +49,15 @@ export function sizeNote(): string {
   const cm = (x: number) => (x / 10).toFixed(1);
   if (model === "tile") {
     const u = (TILE.vox * moduleMm.tile) / 5, d = TILE.dims;
-    return `總尺寸 ${cm(d[0] * u)} × ${cm(d[1] * u)} × ${cm(d[2] * u)} cm。`;
+    return t("總尺寸 {w} × {h} × {d} cm。", { w: cm(d[0] * u), h: cm(d[1] * u), d: cm(d[2] * u) });
   }
   if (!result) return "";
   const side = cm(result.n * moduleMm.sil);
-  return `總尺寸 ${side} × ${side} × ${side} cm。 剪影要在約 ${(farDistanceCm(result.n, moduleMm.sil) / 100).toFixed(0)} m 外拍攝（視差限制和實際尺寸成正比）。`;
+  return (
+    t("總尺寸 {w} × {h} × {d} cm。", { w: side, h: side, d: side }) +
+    " " +
+    t("剪影要在約 {m} m 外拍攝（視差限制和實際尺寸成正比）。", { m: (farDistanceCm(result.n, moduleMm.sil) / 100).toFixed(0) })
+  );
 }
 
 /** the printable parts of the model on screen */
@@ -69,17 +74,17 @@ export function modelParts(): Part[] {
 export async function download(o: ExportOptions): Promise<string> {
   const base = fileBase(o.name);
   if (o.format === "png-view") {
-    if (!captureView) throw new Error("畫面還沒準備好。");
+    if (!captureView) throw new Error(t("畫面還沒準備好。"));
     const name = base + "-view.png";
     saveBlob(await captureView(), name);
-    return `已下載 ${name}。`;
+    return t("已下載 {f}。", { f: name });
   }
   if (o.format === "png-qr" || o.format === "svg-qr") {
     const { result } = useStudio.getState();
     if (!result) throw new NoModel();
     const { n, S } = silhouetteImage(result, o.view), name = `${base}-${VIEW_FILE[o.view]}.${o.format === "svg-qr" ? "svg" : "png"}`;
     saveBlob(o.format === "svg-qr" ? new Blob([silhouetteSvg(n, S, o.border)], { type: "image/svg+xml" }) : await silhouettePng(n, S, o.border), name);
-    return `已下載 ${name}。`;
+    return t("已下載 {f}。", { f: name });
   }
   const parts = modelParts(), meshes = [];
   for (const p of parts) meshes.push({ name: p.name, color: p.color, mesh: await unionBoxes(p.boxes, p.scale) });
@@ -101,7 +106,8 @@ export async function download(o: ExportOptions): Promise<string> {
   }
   saveBlob(blob, name);
   return (
-    `已下載 ${name}：${tris.toLocaleString()} 個三角形、${pieces} 件，約 ${Math.round(blob.size / 1024)} KB。 ` +
-    (closed ? "網格水密。" : "注意：網格有未封閉的邊，切片前請先修復。")
+    t("已下載 {f}：{t} 個三角形、{p} 件，約 {kb} KB。", { f: name, t: tris.toLocaleString(), p: pieces, kb: Math.round(blob.size / 1024) }) +
+    " " +
+    t(closed ? "網格水密。" : "注意：網格有未封閉的邊，切片前請先修復。")
   );
 }

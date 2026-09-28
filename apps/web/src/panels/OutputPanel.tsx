@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useStudio } from "@/store";
 import { Field, Note, Panel, inputClass } from "@/components/Panel";
 import { FORMATS, download, sizeNote, type Format } from "@/lib/export";
+import { t, useT } from "@/i18n";
 
 const VIEWS = ["上方", "前方", "側面"];
 const LIBRARY_ERROR = "無法載入網格函式庫（需要網路）。請重新整理後再試。";
@@ -13,6 +14,7 @@ export function OutputPanel() {
   const setModuleMm = useStudio((s) => s.setModuleMm);
   const result = useStudio((s) => s.result);
   useStudio((s) => s.moduleMm); // the size note follows every module size
+  useT();
   const [format, setFormat] = useState<Format>("stl");
   const [view, setView] = useState(0);
   const [border, setBorder] = useState(4);
@@ -34,12 +36,12 @@ export function OutputPanel() {
 
   const run = async () => {
     setBusy(true);
-    setMsg({ text: "產生網格中…" });
+    setMsg({ text: t("產生網格中…") });
     try {
       setMsg({ text: await download({ format, name, view, border }) });
     } catch (e) {
       const text = String((e as Error).message ?? e);
-      setMsg({ text: /import|fetch|Failed|wasm/i.test(text) ? LIBRARY_ERROR : text, bad: true });
+      setMsg({ text: /import|fetch|Failed|wasm/i.test(text) ? t(LIBRARY_ERROR) : text, bad: true });
     } finally {
       setBusy(false);
     }
@@ -73,7 +75,7 @@ export function OutputPanel() {
         <select id="outFmt" className={inputClass} value={format} onChange={(e) => setFormat(e.target.value as Format)}>
           {FORMATS.map(([v, l]) => (
             <option key={v} value={v} disabled={model !== "sil" && (v === "png-qr" || v === "svg-qr")}>
-              {l}
+              {t(l)}
             </option>
           ))}
         </select>
@@ -84,17 +86,17 @@ export function OutputPanel() {
             <select id="outView" className={inputClass} value={view} onChange={(e) => setView(+e.target.value)}>
               {VIEWS.map((l, i) => (
                 <option key={i} value={i} disabled={i === 2 && !sideIsQr}>
-                  {l}
+                  {t(l)}
                 </option>
               ))}
             </select>
           </Field>
           <div className="flex items-baseline justify-between gap-2.5">
-            <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">邊框（模組）</span>
+            <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("邊框（模組）")}</span>
             <span className="font-mono text-[13px] tabular-nums">{border}</span>
           </div>
-          <input type="range" id="outBorder" aria-label="邊框（模組）" min={0} max={8} value={border} onChange={(e) => setBorder(+e.target.value)} className="w-full accent-accent" />
-          <Note>QR 剪影就是可解碼證明檢查的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。</Note>
+          <input type="range" id="outBorder" aria-label={t("邊框（模組）")} min={0} max={8} value={border} onChange={(e) => setBorder(+e.target.value)} className="w-full accent-accent" />
+          <Note>{t("QR 剪影就是可解碼證明檢查的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。")}</Note>
         </div>
       )}
       <Field label="檔名" htmlFor="outName" inline={false}>
@@ -107,12 +109,12 @@ export function OutputPanel() {
         onClick={() => void run()}
         className="mt-1 w-full cursor-pointer rounded-lg border border-accent bg-accent px-2.5 py-3 text-[15px] font-bold tracking-[.06em] text-accent-ink disabled:cursor-wait disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
       >
-        下載
+        {t("下載")}
       </button>
       <p id="dlMsg" aria-live="polite" className={`m-0 min-h-[1lh] text-xs leading-snug ${msg.bad ? "text-bad" : "text-muted"}`}>
         {msg.text}
       </p>
-      <Note>3MF 含兩個零件，可直接用雙色印表機。</Note>
+      <Note>{t("3MF 含兩個零件，可直接用雙色印表機。")}</Note>
     </Panel>
   );
 }

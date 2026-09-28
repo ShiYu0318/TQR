@@ -2,6 +2,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import { useStudio } from "@/store";
 import { ISO_ELEVATION, cmToSlider, formatDistance, live, sliderToCm, subscribeLive } from "@/three/live";
 import { Gizmo } from "./Gizmo";
+import { useT } from "@/i18n";
 import { EyeIcon, FullscreenIcon, ResetIcon } from "./icons";
 
 /** frosted card floating over the 3D view */
@@ -23,6 +24,7 @@ function StageButton(props: { label: string; pressed?: boolean; onClick(): void;
 }
 
 function Readout() {
+  const t = useT();
   const az = useRef<HTMLElement>(null), el = useRef<HTMLElement>(null);
   useEffect(() => {
     let last = "";
@@ -39,11 +41,11 @@ function Readout() {
   return (
     <dl className="m-0 grid gap-px font-mono text-[11.5px] tabular-nums">
       <div className="flex justify-between gap-2.5">
-        <dt className="text-[10px] tracking-widest text-muted uppercase">方位</dt>
+        <dt className="text-[10px] tracking-widest text-muted uppercase">{t("方位")}</dt>
         <dd ref={az} className="m-0 text-right">0.0°</dd>
       </div>
       <div className="flex justify-between gap-2.5">
-        <dt className="text-[10px] tracking-widest text-muted uppercase">仰角</dt>
+        <dt className="text-[10px] tracking-widest text-muted uppercase">{t("仰角")}</dt>
         <dd ref={el} className="m-0 text-right">0.0°</dd>
       </div>
     </dl>
@@ -83,6 +85,7 @@ export function RightColumn({ fullscreen, onFullscreen, onHide }: Props) {
   const distanceCm = useStudio((s) => s.camera.distanceCm);
   const spinSpeed = useStudio((s) => s.camera.spinSpeed);
   const setCamera = useStudio((s) => s.setCamera);
+  const t = useT();
   const hide = clean ? "invisible opacity-0 pointer-events-none" : "";
 
   const reset = () => {
@@ -95,14 +98,14 @@ export function RightColumn({ fullscreen, onFullscreen, onHide }: Props) {
   return (
     <div className="pointer-events-none absolute top-2 right-2 bottom-[calc(var(--barh,110px)+14px)] z-[2] flex w-[116px] flex-col items-stretch gap-1.5 max-[900px]:static max-[900px]:w-auto">
       <div className="pointer-events-auto flex gap-1.5">
-        <StageButton label="回到最佳視角（等角：方位 45°、仰角 35.26°）" onClick={reset} className={hide}>
+        <StageButton label={t("回到最佳視角（等角：方位 45°、仰角 35.26°）")} onClick={reset} className={hide}>
           <ResetIcon />
         </StageButton>
-        <StageButton label={fullscreen ? "離開全螢幕（Esc）" : "全螢幕"} pressed={fullscreen} onClick={onFullscreen} className={hide}>
+        <StageButton label={t(fullscreen ? "離開全螢幕（Esc）" : "全螢幕")} pressed={fullscreen} onClick={onFullscreen} className={hide}>
           <FullscreenIcon inward={fullscreen} />
         </StageButton>
         <StageButton
-          label={clean ? "顯示控制元件" : "隱藏畫面上的控制元件"}
+          label={t(clean ? "顯示控制元件" : "隱藏畫面上的控制元件")}
           pressed={clean}
           onClick={onHide}
           className="eye-button"
@@ -116,8 +119,8 @@ export function RightColumn({ fullscreen, onFullscreen, onHide }: Props) {
       </div>
       <div className={`${overlay} pointer-events-auto flex min-h-0 flex-1 justify-around gap-1 px-1.5 pt-2.5 pb-2 transition-[opacity,visibility] duration-200 max-[900px]:flex-none ${hide}`}>
         <VSlider
-          label="距離"
-          aria="相機距離"
+          label={t("距離")}
+          aria={t("相機距離")}
           value={cmToSlider(distanceCm)}
           min={0}
           max={1000}
@@ -125,8 +128,8 @@ export function RightColumn({ fullscreen, onFullscreen, onHide }: Props) {
           onChange={(v) => setCamera({ distanceCm: sliderToCm(v) })}
         />
         <VSlider
-          label="轉速"
-          aria="旋轉速度（每秒幾度）"
+          label={t("轉速")}
+          aria={t("旋轉速度（每秒幾度）")}
           value={spinSpeed}
           min={5}
           max={90}

@@ -1,5 +1,6 @@
 // What each QR view encodes: a content type and its fields, turned into the standard payload scanners understand.
 // Same types and encodings as reference.html (tested in content.test.ts).
+import { t } from "@/i18n";
 
 export type FieldKind = "text" | "area" | "select" | "check" | "date" | "time";
 export type Values = Record<string, string | boolean>;
@@ -150,8 +151,8 @@ export function contentTitle(type: string, fv: Values): string {
   const main = type === "vcard"
     ? fullName(String(fv.first ?? ""), String(fv.last ?? "")) || fv.org
     : def.fields.map((d) => (d.kind === "select" || d.kind === "check" ? "" : fv[d.key])).find((x) => x && String(x).trim());
-  return def.label + (main ? " · " + String(main).trim().replace(/\s+/g, " ").slice(0, 24) : "");
+  return t(def.label) + (main ? " · " + String(main).trim().replace(/\s+/g, " ").slice(0, 24) : "");
 }
 
 /** one-line preview of a payload */
-export const payloadPreview = (s: string) => s.replace(/\s*\n\s*/g, " ⏎ ").slice(0, 60) || "（尚未填寫）";
+export const payloadPreview = (s: string) => s.replace(/\s*\n\s*/g, " ⏎ ").slice(0, 60) || t("（尚未填寫）");

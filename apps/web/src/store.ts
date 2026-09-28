@@ -5,8 +5,10 @@ import { DEFAULT_COLORS, type Colors } from "@/three/palette";
 import type { Values } from "@/lib/content";
 import type { SideLogo } from "@/lib/sideLogo";
 import type { CenterLogo } from "@/lib/centerLogo";
+import { defaultLang, setLanguage } from "@/i18n";
 
-export type Lang = "zh" | "en";
+export type { Lang } from "@/i18n";
+import type { Lang } from "@/i18n";
 export type Model = "sil" | "tile";
 export type Look = "sil" | "real" | "solid" | "pieces";
 export type Shape = "cube" | "rounded" | "cylinder" | "sphere";
@@ -116,7 +118,7 @@ const url = (u: string): Content => ({ type: "url", fields: { url: u } });
 export const useStudio = create<State>()(
   persist(
     (set) => ({
-      lang: "zh",
+      lang: defaultLang(),
       model: "sil",
       panels: { content: true, structure: true, look: true, logo: false, output: true, share: true },
       clean: false,
@@ -144,7 +146,10 @@ export const useStudio = create<State>()(
       scan: { ready: false, text: null, key: null, reason: "" },
       found: { sil: [], tile: [] },
 
-      setLang: (lang) => set({ lang }),
+      setLang: (lang) => {
+        setLanguage(lang);
+        set({ lang });
+      },
       setModel: (model) => set({ model }),
       setPanel: (id, open) => set((s) => ({ panels: { ...s.panels, [id]: open } })),
       setClean: (clean) => set({ clean }),
@@ -169,6 +174,7 @@ export const useStudio = create<State>()(
     }),
     {
       name: "tqr.studio",
+      onRehydrateStorage: () => (s) => setLanguage(s?.lang ?? defaultLang()),
       // per-viewer conveniences only; the design itself travels in share links and saved files
       partialize: (s) => ({ lang: s.lang, panels: s.panels, look: { backdrop: s.look.backdrop, floor: s.look.floor } }),
       merge: (saved, current) => {

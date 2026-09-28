@@ -7,6 +7,7 @@ import { ControlBar } from "./ControlBar";
 import { Hint } from "./Hint";
 import { live, subscribeLive } from "@/three/live";
 import { scheduleScan } from "@/lib/scan";
+import { useT } from "@/i18n";
 
 /**
  * The 3D view with its overlays. Owns three behaviours of the stage as a whole:
@@ -18,6 +19,7 @@ export function StageView() {
   const box = useRef<HTMLDivElement>(null);
   const clean = useStudio((s) => s.clean);
   const busy = useStudio((s) => s.busy);
+  const t = useT();
   const setClean = useStudio((s) => s.setClean);
   const [fullscreen, setFullscreen] = useState(false);
   const [maxi, setMaxi] = useState(false);
@@ -138,7 +140,7 @@ export function StageView() {
       <Stage />
       {busy && (
         <div className="absolute inset-0 z-[3] flex items-center justify-center bg-[rgba(13,17,23,.65)] font-mono text-sm text-ink" role="status">
-          生成中…
+          {t("生成中…")}
         </div>
       )}
       <Hint />

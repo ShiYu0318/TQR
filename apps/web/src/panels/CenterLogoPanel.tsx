@@ -4,6 +4,7 @@ import { Field, Note, Panel, inputClass } from "@/components/Panel";
 import { bitsFromImage, centerLogoOverlay, LOGO_FONTS, type CenterLogo, type CenterStyle } from "@/lib/centerLogo";
 import { encodeContent } from "@/lib/content";
 import { qrMatrix, qrVersion } from "@/lib/qr";
+import { t, useT } from "@/i18n";
 
 const FONT_NAMES: Record<keyof typeof LOGO_FONTS, string> = {
   sans: "系統預設黑體", jhenghei: "微軟正黑體", pingfang: "蘋方 (Apple)", kai: "標楷體", serif: "系統預設明體", mono: "等寬字體",
@@ -13,10 +14,10 @@ function Slider(props: { label: string; value: number; min: number; max: number;
   return (
     <div>
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{props.label}</span>
+        <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t(props.label)}</span>
         <span className="font-mono text-[13px] tabular-nums">{props.value}</span>
       </div>
-      <input type="range" aria-label={props.label} min={props.min} max={props.max} value={props.value} onChange={(e) => props.onChange(+e.target.value)} className="w-full accent-accent" />
+      <input type="range" aria-label={t(props.label)} min={props.min} max={props.max} value={props.value} onChange={(e) => props.onChange(+e.target.value)} className="w-full accent-accent" />
     </div>
   );
 }
@@ -44,7 +45,7 @@ function Preview({ L }: { L: CenterLogo }) {
         g.fillRect((n - 1 - r + 2) * s, (c + 2) * s, Math.ceil(s), Math.ceil(s));
       }
   }, [L, design.content, design.version, design.level]);
-  return <canvas ref={canvas} width={120} height={120} aria-label="中央 Logo 預覽" className="size-[120px] flex-none rounded border border-rule [image-rendering:pixelated]" />;
+  return <canvas ref={canvas} width={120} height={120} aria-label={t("中央 Logo 預覽")} className="size-[120px] flex-none rounded border border-rule [image-rendering:pixelated]" />;
 }
 
 export function CenterLogoPanel() {
@@ -53,6 +54,7 @@ export function CenterLogoPanel() {
   const setDesign = useStudio((s) => s.setDesign);
   const set = (patch: Partial<CenterLogo>) => setDesign({ centerLogo: { ...L, ...patch } });
   const on = L.kind !== "none";
+  useT();
 
   const upload = (file: File | undefined) => {
     if (!file) return;
@@ -68,9 +70,9 @@ export function CenterLogoPanel() {
     <Panel id="logo" title="中央 Logo" side="left">
       <Field label="Logo 類型" htmlFor="clKind">
         <select id="clKind" className={inputClass} value={L.kind} onChange={(e) => set({ kind: e.target.value as CenterLogo["kind"] })}>
-          <option value="none">不放 Logo</option>
-          <option value="text">文字 Logo</option>
-          <option value="image">圖片 Logo</option>
+          <option value="none">{t("不放 Logo")}</option>
+          <option value="text">{t("文字 Logo")}</option>
+          <option value="image">{t("圖片 Logo")}</option>
         </select>
       </Field>
       {L.kind === "text" && (
@@ -81,7 +83,7 @@ export function CenterLogoPanel() {
           <Field label="字型" htmlFor="clFont">
             <select id="clFont" className={inputClass} value={L.font} onChange={(e) => set({ font: e.target.value as CenterLogo["font"] })}>
               {Object.entries(FONT_NAMES).map(([k, n]) => (
-                <option key={k} value={k}>{n}</option>
+                <option key={k} value={k}>{t(n)}</option>
               ))}
             </select>
           </Field>
@@ -96,10 +98,10 @@ export function CenterLogoPanel() {
         <>
           <Field label="背景樣式" htmlFor="clStyle">
             <select id="clStyle" className={inputClass} value={L.style} onChange={(e) => set({ style: e.target.value as CenterStyle })}>
-              <option value="box">方框</option>
-              <option value="bar">長條</option>
-              <option value="outline">字外框</option>
-              <option value="clear">透明底</option>
+              <option value="box">{t("方框")}</option>
+              <option value="bar">{t("長條")}</option>
+              <option value="outline">{t("字外框")}</option>
+              <option value="clear">{t("透明底")}</option>
             </select>
           </Field>
           <div className="grid grid-cols-2 gap-x-3 gap-y-1">
@@ -109,7 +111,7 @@ export function CenterLogoPanel() {
             <Slider label="垂直位置" min={-6} max={6} value={L.dy} onChange={(v) => set({ dy: v })} />
           </div>
           <div className="flex flex-col gap-1">
-            <span className="text-[12.5px] text-muted">放在哪些方向</span>
+            <span className="text-[12.5px] text-muted">{t("放在哪些方向")}</span>
             <div className="flex flex-wrap gap-x-3.5 gap-y-1">
               {["上方", "前方", "側面"].map((name, i) =>
                 i === 2 && mode !== "3qr" ? null : (
@@ -120,7 +122,7 @@ export function CenterLogoPanel() {
                       checked={L.views.includes(i)}
                       onChange={(e) => set({ views: e.target.checked ? [...L.views, i].sort() : L.views.filter((v) => v !== i) })}
                     />
-                    {name}
+                    {t(name)}
                   </label>
                 ),
               )}
@@ -128,7 +130,7 @@ export function CenterLogoPanel() {
           </div>
           <div className="flex items-center gap-2.5">
             <Preview L={L} />
-            <Note>預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。</Note>
+            <Note>{t("預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。")}</Note>
           </div>
         </>
       )}

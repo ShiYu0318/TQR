@@ -7,6 +7,7 @@ import { CenterLogoPanel } from "@/panels/CenterLogoPanel";
 import { TileContentPanel } from "@/panels/TileContentPanel";
 import { OutputPanel } from "@/panels/OutputPanel";
 import { SharePanel } from "@/panels/SharePanel";
+import { useT } from "@/i18n";
 
 /** Left column: design panels that scroll, and the one main action pinned below them. */
 export function LeftSidebar() {
@@ -14,8 +15,9 @@ export function LeftSidebar() {
   const busy = useStudio((s) => s.busy);
   const message = useStudio((s) => s.message);
   const sil = model === "sil";
+  const t = useT();
   return (
-    <aside className="area-left flex min-h-0 flex-col" aria-label="設計">
+    <aside className="area-left flex min-h-0 flex-col" aria-label={t("設計")}>
       <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-contain [scrollbar-color:var(--color-rule)_transparent] [scrollbar-width:thin] max-[900px]:overflow-visible">
         {sil ? <ContentPanel /> : <TileContentPanel />}
         <StructurePanel />
@@ -36,7 +38,7 @@ export function LeftSidebar() {
             onClick={() => void generate()}
             className="w-full cursor-pointer rounded-lg border border-accent bg-accent px-2.5 py-[11px] text-[15px] font-bold tracking-[.06em] text-accent-ink disabled:cursor-wait disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            生成
+            {t("生成")}
           </button>
         </div>
       )}
@@ -46,8 +48,9 @@ export function LeftSidebar() {
 
 /** Right column: output and sharing. */
 export function RightSidebar() {
+  const t = useT();
   return (
-    <aside className="area-right flex min-h-0 flex-col gap-3 overflow-y-auto [scrollbar-width:thin]" aria-label="輸出與分享">
+    <aside className="area-right flex min-h-0 flex-col gap-3 overflow-y-auto [scrollbar-width:thin]" aria-label={t("輸出與分享")}>
       <OutputPanel />
       <SharePanel />
     </aside>

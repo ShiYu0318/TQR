@@ -1,6 +1,7 @@
 // A logo in the middle of each QR view (F8 + N10). The logo is drawn in the QR's own module grid (row = first view
 // coordinate), so it reads upright like the code. The solver counts the codewords it changes against the error
 // correction first and bridges only with what is left, so the views stay certified. Same logic as the reference app.
+import { t } from "@/i18n";
 
 export type CenterKind = "none" | "text" | "image";
 export type CenterStyle = "box" | "bar" | "outline" | "clear";
@@ -144,5 +145,5 @@ const VIEW_NAMES = ["上方", "前方", "側面"];
 export function logoErrorMessage(err: string): string | null {
   const m = /LOGO_TOO_LARGE:(\d+):(\d+):(\d+):(\d+)/.exec(err || "");
   if (!m) return null;
-  return `Logo 太大：${VIEW_NAMES[+m[4]]}的第 ${+m[1] + 1} 區塊要改動 ${m[2]} 個碼字，但只能更正 ${m[3]} 個。請縮小 Logo、改用「字外框」或「透明底」，或加大 QR 版本。`;
+  return t("Logo 太大：{view}的第 {b} 區塊要改動 {x} 個碼字，但只能更正 {c} 個。請縮小 Logo、改用「字外框」或「透明底」，或加大 QR 版本。", { view: t(VIEW_NAMES[+m[4]]), b: +m[1] + 1, x: m[2], c: m[3] });
 }
