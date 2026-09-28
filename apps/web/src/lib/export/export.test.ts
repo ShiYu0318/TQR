@@ -1,26 +1,25 @@
-// Export must match the reference app: run the studio's own mesh and 2D functions (read from
-// reference.html) against this port, then check the file writers and a real manifold union.
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+// Export must match the reference app: run the studio's own mesh and 2D functions against this port, then check the
+// file writers and a real manifold union.
 import { describe, expect, it } from "vitest";
 import TRI, { type Result } from "@tqr/tri-core";
 import ref from "../../../../../tests/fixtures/js_ref.json";
 import { addStruts, boxesFromMask, sculptureMask, sculptureParts, unionBoxes, weldMesh } from "./mesh";
 import { crc32, stlBinary, zipStore } from "./formats";
 import { silhouetteImage, silhouetteSvg } from "./twoD";
+import { cut, studioSource } from "@/testing/studio";
 
-const template = readFileSync(fileURLToPath(new URL("../../../../../reference.html", import.meta.url)), "utf8");
-const cut = (from: string, to: string) => template.slice(template.indexOf(from), template.indexOf(to, template.indexOf(from)));
-const studio = new Function(
-  cut("function boxesFromMask", "async function unionBoxes") +
-    cut("function sculptureMask", "async function modelParts") +
-    "return {boxesFromMask, weldMesh, sculptureMask, addStruts};",
-)() as {
-  boxesFromMask: typeof boxesFromMask;
-  weldMesh: typeof weldMesh;
-  sculptureMask: typeof sculptureMask;
-  addStruts: typeof addStruts;
-};
+const studio = studioSource
+  ? (new Function(
+      cut("function boxesFromMask", "async function unionBoxes") +
+        cut("function sculptureMask", "async function modelParts") +
+        "return {boxesFromMask, weldMesh, sculptureMask, addStruts};",
+    )() as {
+      boxesFromMask: typeof boxesFromMask;
+      weldMesh: typeof weldMesh;
+      sculptureMask: typeof sculptureMask;
+      addStruts: typeof addStruts;
+    })
+  : null;
 // the studio reads the generated result from a global GEN
 const studioSilhouette = (r: Result, view: number) =>
   new Function("GEN", cut("function silhouetteImage", "function qrExport") + "return silhouetteImage;")({ r })(view) as { n: number; S: Uint8Array };
@@ -28,28 +27,22 @@ const studioSilhouette = (r: Result, view: number) =>
 const qr = ref.demo.qr.map((m) => Uint8Array.from(m));
 const result = TRI.generate({ qr, version: ref.demo.version, level: "H", mode: "3qr", method: "bridge+strut", budget: 0.5 });
 
-describe("mesh pipeline matches the reference app", () => {
+describe.skipIf(!studio)("mesh pipeline matches the reference app", () => {
   for (const k of [2, 4, 5]) {
     it(`fine mask, struts and boxes at k=${k}`, () => {
-      const mine = sculptureMask(result, k), theirs = studio.sculptureMask(result, k);
+      const mine = sculptureMask(result, k), theirs = studio!.sculptureMask(result, k);
       addStruts(mine.F, mine.N, result, k);
-      studio.addStruts(theirs.F, theirs.N, result, k);
+      studio!.addStruts(theirs.F, theirs.N, result, k);
       expect(mine.N).toBe(theirs.N);
       expect(Buffer.from(mine.F).equals(Buffer.from(theirs.F))).toBe(true);
-      expect(boxesFromMask(mine.F, mine.N, mine.N, mine.N)).toEqual(studio.boxesFromMask(theirs.F, theirs.N, theirs.N, theirs.N));
+      expect(boxesFromMask(mine.F, mine.N, mine.N, mine.N)).toEqual(studio!.boxesFromMask(theirs.F, theirs.N, theirs.N, theirs.N));
     });
   }
-  it("boxes cover exactly the mask", () => {
-    const { F, N } = sculptureMask(result, 2), cover = new Uint8Array(F.length);
-    for (const [x0, y0, z0, x1, y1, z1] of boxesFromMask(F, N, N, N))
-      for (let a = x0; a < x1; a++) for (let b = y0; b < y1; b++) for (let c = z0; c < z1; c++) cover[(a * N + b) * N + c]++;
-    expect(Array.from(cover)).toEqual(Array.from(F));
-  });
   it("welds like the studio", () => {
     // two triangles sharing an edge, one vertex repeated at a float32-equal position
     const vp = [0, 0, 0, 1, 0, 0, 0, 1, 0, 1 + 1e-12, 0, 0, 1, 1, 0, 0, 1, 0];
     const tv = [0, 1, 2, 3, 4, 5];
-    const mine = weldMesh(vp, 3, tv), theirs = studio.weldMesh(vp, 3, tv);
+    const mine = weldMesh(vp, 3, tv), theirs = studio!.weldMesh(vp, 3, tv);
     expect(Array.from(mine.verts)).toEqual(Array.from(theirs.verts));
     expect(Array.from(mine.tris)).toEqual(Array.from(theirs.tris));
     expect(mine.verts.length).toBe(12);
@@ -64,6 +57,12 @@ describe("mesh pipeline matches the reference app", () => {
 });
 
 describe("silhouette is the QR it encodes", () => {
+  it("boxes cover exactly the mask", () => {
+    const { F, N } = sculptureMask(result, 2), cover = new Uint8Array(F.length);
+    for (const [x0, y0, z0, x1, y1, z1] of boxesFromMask(F, N, N, N))
+      for (let a = x0; a < x1; a++) for (let b = y0; b < y1; b++) for (let c = z0; c < z1; c++) cover[(a * N + b) * N + c]++;
+    expect(Array.from(cover)).toEqual(Array.from(F));
+  });
   it("the top view, turned back to QR orientation, is the demo matrix", () => {
     // top: screen x = n-1-row, screen y = col
     const { n, S } = silhouetteImage(result, 0), M = qr[0];

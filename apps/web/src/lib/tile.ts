@@ -1,4 +1,4 @@
-import data from "../../../../data/tile.json";
+import data from "@/data/tile.json";
 
 /** The QQR five-view egg-crate demo: two filament box lists and the five links it carries (fixed data). */
 export interface TileData {
@@ -11,4 +11,4 @@ export interface TileData {
   links: Record<"T" | "N" | "E" | "S" | "W", string>;
 }
 
-export const TILE = data.tile as unknown as TileData;
+export const TILE = data as unknown as TileData;

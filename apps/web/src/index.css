@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* GitHub-dark tokens, the same values as reference.html */
+/* GitHub-dark tokens, the same values as the reference app */
 @theme {
   --color-bg: #0d1117;
   --color-panel: #161b22;

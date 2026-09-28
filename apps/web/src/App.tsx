@@ -7,7 +7,7 @@ import { farDistanceCm } from "@/three/geometry";
 import { generate } from "@/lib/actions";
 import { useStudio } from "@/store";
 
-// Layout matches reference.html: header on top, settings left and right of the 3D stage,
+// Layout matches the reference app: header on top, settings left and right of the 3D stage,
 // numbers and checks under it.
 export function App() {
   useEffect(() => void generate(), []);

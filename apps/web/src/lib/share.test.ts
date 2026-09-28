@@ -1,16 +1,15 @@
 // Share tokens must round-trip, and must stay readable by (and read) the reference app's own encoder.
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { useStudio } from "@/store";
 import { decodeState, encodeState, getState, setState, type SavedState } from "./share";
+import { cut, studioSource } from "@/testing/studio";
 
-const template = readFileSync(fileURLToPath(new URL("../../../../reference.html", import.meta.url)), "utf8");
-const cut = (from: string, to: string) => template.slice(template.indexOf(from), template.indexOf(to, template.indexOf(from)));
-const studio = new Function(cut("const b64url", "function shareMsg") + "return {encodeState, decodeState};")() as {
-  encodeState(s: object): string;
-  decodeState(t: string): SavedState;
-};
+const studio = studioSource
+  ? (new Function(cut("const b64url", "function shareMsg") + "return {encodeState, decodeState};")() as {
+      encodeState(s: object): string;
+      decodeState(t: string): SavedState;
+    })
+  : null;
 
 describe("share tokens", () => {
   it("round-trip the whole design, look and module sizes", () => {
@@ -30,10 +29,10 @@ describe("share tokens", () => {
     setState(decodeState(tok));
     expect(getState()).toEqual(before);
   });
-  it("is the reference app's format", () => {
+  it.skipIf(!studio)("is the reference app's format", () => {
     const s = getState();
-    expect(studio.decodeState(encodeState(s))).toEqual(s);
-    expect(decodeState(studio.encodeState(s))).toEqual(s);
+    expect(studio!.decodeState(encodeState(s))).toEqual(s);
+    expect(decodeState(studio!.encodeState(s))).toEqual(s);
   });
   it("rejects what is not v1 settings and ignores unknown values", () => {
     expect(() => setState(null)).toThrow();

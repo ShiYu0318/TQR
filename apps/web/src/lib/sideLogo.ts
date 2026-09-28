@@ -1,5 +1,5 @@
 // The third view of "2 QR + logo": a pixel picture in the QR's module grid, drawn upright for the side camera.
-// Same drawing as reference.html so the same settings give the same sculpture.
+// Same drawing as the reference app so the same settings give the same sculpture.
 
 export type LogoKind = "heart" | "star" | "ring" | "text";
 

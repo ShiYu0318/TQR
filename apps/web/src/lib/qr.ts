@@ -3,7 +3,7 @@ import qrcode from "qrcode-generator";
 type TypeNumber = Parameters<typeof qrcode>[0];
 import type { Level } from "@tqr/tri-core";
 
-// Same generator and version as reference.html, so the same text gives the same matrix (and mask).
+// Same generator and version as the reference app, so the same text gives the same matrix (and mask).
 
 /** smallest QR version that holds the text at this level (throws when it does not fit version 40) */
 export function qrVersion(text: string, level: Level): number {
