@@ -1,9 +1,11 @@
+node_modules/
+dist/
+dist-single/
+build/
+coverage/
+.env*.local
 __pycache__/
 *.pyc
 .venv/
 *.egg-info/
-node_modules/
 .DS_Store
-dist/
-dist-single/
-
