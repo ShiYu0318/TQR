@@ -45,7 +45,7 @@ function Preview({ L }: { L: CenterLogo }) {
         g.fillRect((n - 1 - r + 2) * s, (c + 2) * s, Math.ceil(s), Math.ceil(s));
       }
   }, [L, design.content, design.version, design.level]);
-  return <canvas ref={canvas} width={120} height={120} aria-label={t("中央 Logo 預覽")} className="size-[120px] flex-none rounded border border-rule [image-rendering:pixelated]" />;
+  return <canvas ref={canvas} width={120} height={120} aria-label={t("中央 Logo 預覽")} className="size-30 flex-none rounded border border-rule [image-rendering:pixelated]" />;
 }
 
 export function CenterLogoPanel() {

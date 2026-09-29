@@ -17,7 +17,7 @@ export function TileContentPanel() {
     <Panel id="content" title="內容" side="left">
       <div className="flex flex-col gap-1">
         <span className="text-[12.5px] text-muted">{t("各方向的內容（點一下轉到那個方向）")}</span>
-        <div className="flex flex-col gap-[3px]" role="group" aria-label={t("各方向的內容")} id="tileViewList">
+        <div className="flex flex-col gap-0.75" role="group" aria-label={t("各方向的內容")} id="tileViewList">
           {ROWS.map(([k, name, az, el]) => (
             <button
               key={k}

@@ -56,7 +56,7 @@ function SideLogoPreview() {
     g.fillStyle = "#111";
     for (let r = 0; r < n; r++) for (let q = 0; q < n; q++) if (img[r * n + q]) g.fillRect(q * s, r * s, Math.ceil(s), Math.ceil(s));
   }, [logo]);
-  return <canvas ref={canvas} width={116} height={116} aria-label={t("Logo 預覽")} className="size-[116px] flex-none border border-rule [image-rendering:pixelated]" />;
+  return <canvas ref={canvas} width={116} height={116} aria-label={t("Logo 預覽")} className="size-29 flex-none border border-rule [image-rendering:pixelated]" />;
 }
 
 export function ContentPanel() {
@@ -82,7 +82,7 @@ export function ContentPanel() {
       </Field>
       <div className="flex flex-col gap-1">
         <span className="text-[12.5px] text-muted">{t("各方向的內容（點一下切換編輯）")}</span>
-        <div className="flex flex-col gap-[3px]" role="group" aria-label={t("各方向的內容")} id="viewList">
+        <div className="flex flex-col gap-0.75" role="group" aria-label={t("各方向的內容")} id="viewList">
           {Array.from({ length: views }, (_, i) => {
             const content = design.content[i];
             return (

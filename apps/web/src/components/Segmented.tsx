@@ -15,7 +15,7 @@ interface Props<T extends string> {
 /** Two or more mutually exclusive buttons on a sunk track (aria-pressed), like the studio's .seg */
 export function Segmented<T extends string>({ label, value, options, onChange, className = "" }: Props<T>) {
   return (
-    <div role="group" aria-label={label} className={`grid grid-flow-col auto-cols-fr gap-[3px] rounded-md bg-sunk p-[3px] ${className}`}>
+    <div role="group" aria-label={label} className={`grid grid-flow-col auto-cols-fr gap-0.75 rounded-md bg-sunk p-0.75 ${className}`}>
       {options.map((o) => (
         <button
           key={o.value}

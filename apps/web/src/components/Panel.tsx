@@ -21,25 +21,25 @@ export function Panel({ id, title, side, children, hidden }: Props) {
   const setPanel = useStudio((s) => s.setPanel);
   useT();
   if (hidden) return null;
-  const closedTurn = side === "left" ? "-rotate-45" : "rotate-[135deg]";
+  const closedTurn = side === "left" ? "-rotate-45" : "rotate-135";
   return (
     <Collapsible.Root
       open={open}
       onOpenChange={(o) => setPanel(id, o)}
-      className="panel flex-shrink-0 rounded-lg border border-rule bg-panel px-[var(--px)] py-2.5 [--bgap:7px] [--px:12px] data-[side=right]:pb-3.5 data-[side=right]:[--bgap:8px] data-[side=right]:[--px:16px]"
+      className="panel shrink-0 rounded-lg border border-rule bg-panel px-(--px) py-2.5 [--bgap:7px] [--px:12px] data-[side=right]:pb-3.5 data-[side=right]:[--bgap:8px] data-[side=right]:[--px:16px]"
       data-side={side}
       id={`${id}Panel`}
     >
       <Collapsible.Trigger
-        className={`relative -mx-[var(--px)] block w-[calc(100%+2*var(--px))] cursor-pointer border-0 bg-transparent px-3 text-center font-display text-sm font-bold tracking-wide text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${open ? "border-b border-solid border-rule pb-1.5" : "pb-0"}`}
+        className={`relative -mx-(--px) block w-[calc(100%+2*var(--px))] cursor-pointer border-0 bg-transparent px-3 text-center font-display text-sm font-bold tracking-wide text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${open ? "border-b border-solid border-rule pb-1.5" : "pb-0"}`}
       >
         {t(title)}
         <span
           aria-hidden="true"
-          className={`absolute top-1.5 size-[7px] border-r-2 border-b-2 border-muted transition-transform duration-150 motion-reduce:transition-none ${side === "left" ? "left-3" : "right-3"} ${open ? "top-0.5 rotate-45" : closedTurn}`}
+          className={`absolute top-1.5 size-1.75 border-r-2 border-b-2 border-muted transition-transform duration-150 motion-reduce:transition-none ${side === "left" ? "left-3" : "right-3"} ${open ? "top-0.5 rotate-45" : closedTurn}`}
         />
       </Collapsible.Trigger>
-      <Collapsible.Content className="mt-2.5 flex flex-col gap-[var(--bgap)]">{children}</Collapsible.Content>
+      <Collapsible.Content className="mt-2.5 flex flex-col gap-(--bgap)">{children}</Collapsible.Content>
     </Collapsible.Root>
   );
 }
@@ -68,4 +68,4 @@ export function Field({ label, htmlFor, children, inline = true }: { label: stri
 
 /** shared look of text inputs and selects */
 export const inputClass =
-  "w-full rounded-md border border-rule bg-panel px-2 py-[5px] font-body text-[13px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "w-full rounded-md border border-rule bg-panel px-2 py-1.25 font-body text-[13px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";

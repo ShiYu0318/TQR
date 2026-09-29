@@ -21,7 +21,7 @@ export function Header() {
         <h1 className="m-0 flex flex-wrap items-center gap-x-2.5 gap-y-1 font-display text-[22px] leading-tight tracking-tight">
           <img src={mark} alt="" width={36} height={36} className="flex-none" />
           {/* 27 px = 9 modules of 3 px, so the pixel letters stay sharp; the Q's tail hangs below the caps */}
-          <img src={wordmark} alt="TQR" width={57} height={27} className="flex-none translate-y-[3px] [image-rendering:pixelated]" />
+          <img src={wordmark} alt="TQR" width={57} height={27} className="flex-none translate-y-0.75 [image-rendering:pixelated]" />
           <span className="font-medium text-muted">Studio</span>
           <small className="font-body text-sm font-medium tracking-normal text-muted">{t("多視角 QR 設計工作室")}</small>
         </h1>
@@ -33,7 +33,7 @@ export function Header() {
       <div className="grid gap-1.5 max-[900px]:grid-flow-col max-[900px]:justify-start">
         <Segmented
           label={t("語言")}
-          className="w-[116px]"
+          className="w-29"
           value={lang}
           onChange={setLang}
           options={[
@@ -43,7 +43,7 @@ export function Header() {
         />
         <Segmented
           label={t("選擇模型")}
-          className="w-[116px]"
+          className="w-29"
           value={model}
           onChange={setModel}
           options={[

@@ -21,7 +21,7 @@ export function Hint() {
   return (
     <div
       aria-hidden="true"
-      className={`pointer-events-none absolute top-2.5 left-1/2 z-[2] flex max-w-[calc(100%-210px)] -translate-x-1/2 flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5 rounded-full border border-rule bg-[rgba(13,17,23,.78)] px-3.5 py-1.5 text-center text-[13px] text-ink backdrop-blur-md transition-[opacity,visibility] duration-200 max-[900px]:static max-[900px]:max-w-none max-[900px]:translate-x-0 max-[900px]:rounded-none ${clean ? "invisible opacity-0" : ""}`}
+      className={`pointer-events-none absolute top-2.5 left-1/2 z-2 flex max-w-[calc(100%-210px)] -translate-x-1/2 flex-wrap items-baseline justify-center gap-x-2 gap-y-0.5 rounded-full border border-rule bg-[rgba(13,17,23,.78)] px-3.5 py-1.5 text-center text-[13px] text-ink backdrop-blur-md transition-[opacity,visibility] duration-200 max-[900px]:static max-[900px]:max-w-none max-[900px]:translate-x-0 max-[900px]:rounded-none ${clean ? "invisible opacity-0" : ""}`}
     >
       <b className="font-semibold break-all">{main}</b>
       {sub && <span className="text-xs text-muted">{sub}</span>}

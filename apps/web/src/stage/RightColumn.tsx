@@ -16,7 +16,7 @@ function StageButton(props: { label: string; pressed?: boolean; onClick(): void;
       title={props.label}
       aria-pressed={props.pressed}
       onClick={props.onClick}
-      className={`${overlay} grid min-h-[37px] flex-1 cursor-pointer place-items-center p-0 transition-[opacity,visibility] duration-200 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:[&>svg]:scale-90 ${props.className ?? ""}`}
+      className={`${overlay} grid min-h-9.25 flex-1 cursor-pointer place-items-center p-0 transition-[opacity,visibility] duration-200 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:[&>svg]:scale-90 ${props.className ?? ""}`}
     >
       {props.children}
     </button>
@@ -65,7 +65,7 @@ function VSlider(props: { label: string; aria: string; value: number; min: numbe
         step={props.step ?? 1}
         value={props.value}
         onChange={(e) => props.onChange(+e.target.value)}
-        className="m-0 h-full min-h-[60px] w-[18px] p-0 accent-accent [direction:rtl] [writing-mode:vertical-lr]"
+        className="m-0 h-full min-h-15 w-4.5 p-0 accent-accent [direction:rtl] [writing-mode:vertical-lr]"
       />
       <span className="text-[10px] text-muted">{props.label}</span>
     </div>
@@ -96,7 +96,7 @@ export function RightColumn({ fullscreen, onFullscreen, onHide }: Props) {
   };
 
   return (
-    <div className="pointer-events-none absolute top-2 right-2 bottom-[calc(var(--barh,110px)+14px)] z-[2] flex w-[116px] flex-col items-stretch gap-1.5 max-[900px]:static max-[900px]:w-auto">
+    <div className="pointer-events-none absolute top-2 right-2 bottom-[calc(var(--barh,110px)+14px)] z-2 flex w-29 flex-col items-stretch gap-1.5 max-[900px]:static max-[900px]:w-auto">
       <div className="pointer-events-auto flex gap-1.5">
         <StageButton label={t("回到最佳視角（等角：方位 45°、仰角 35.26°）")} onClick={reset} className={hide}>
           <ResetIcon />

@@ -13,9 +13,9 @@ function Pill({ tone, children }: { tone: "ok" | "warn" | "bad"; children: React
 /** how much of each block's error correction the view uses */
 function Bars({ e }: { e: Certificate }) {
   return (
-    <span className="inline-flex items-center gap-[3px]">
+    <span className="inline-flex items-center gap-0.75">
       {e.blockErrors.map((b, j) => (
-        <i key={j} title={t("區塊 {j}：{b}/{c}", { j: j + 1, b, c: e.cap[j] })} className="relative inline-block h-1.5 w-[26px] overflow-hidden rounded-[3px] bg-sunk">
+        <i key={j} title={t("區塊 {j}：{b}/{c}", { j: j + 1, b, c: e.cap[j] })} className="relative inline-block h-1.5 w-6.5 overflow-hidden rounded-[3px] bg-sunk">
           <b className="absolute inset-y-0 left-0 bg-accent" style={{ width: `${Math.min(100, (100 * b) / e.cap[j])}%` }} />
         </i>
       ))}

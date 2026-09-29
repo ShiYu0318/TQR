@@ -135,11 +135,11 @@ export function StageView() {
       onPointerMove={onPointerMove}
       onPointerLeave={onPointerLeave}
       onPointerDown={(e) => e.target instanceof HTMLCanvasElement && !(e.target as HTMLElement).closest('[role=img]') && useStudio.getState().setCamera({ spin: null })}
-      className={`stage area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square ${clean ? "clean" : ""} ${hot ? "hot" : ""} ${maxi ? "!fixed inset-0 z-50 !rounded-none !border-0" : ""} [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
+      className={`stage area-stage relative min-h-0 min-w-0 overflow-hidden rounded-lg border border-rule bg-sunk max-[900px]:aspect-square ${clean ? "clean" : ""} ${hot ? "hot" : ""} ${maxi ? "!fixed inset-0 z-50 rounded-none! border-0!" : ""} [&:fullscreen]:rounded-none [&:fullscreen]:border-0`}
     >
       <Stage />
       {busy && (
-        <div className="absolute inset-0 z-[3] flex items-center justify-center bg-[rgba(13,17,23,.65)] font-mono text-sm text-ink" role="status">
+        <div className="absolute inset-0 z-3 flex items-center justify-center bg-[rgba(13,17,23,.65)] font-mono text-sm text-ink" role="status">
           {t("生成中…")}
         </div>
       )}

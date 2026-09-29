@@ -8,7 +8,7 @@ import { t, useT } from "@/i18n";
 export const sharedNote = { text: "" };
 
 const btn =
-  "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-rule bg-sunk px-2.5 py-[7px] text-[13px] text-ink hover:border-muted disabled:cursor-default disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-rule bg-sunk px-2.5 py-1.75 text-[13px] text-ink hover:border-muted disabled:cursor-default disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
 
 function Icon({ children }: { children: ReactNode }) {
   return (
@@ -129,7 +129,7 @@ export function SharePanel() {
         </div>
         <input ref={file} type="file" id="importFile" accept="application/json,.json" hidden onChange={(e) => void importJson(e.target.files?.[0])} />
       </div>
-      <p id="shareMsg" aria-live="polite" className="m-0 min-h-[1lh] text-xs leading-snug text-muted">
+      <p id="shareMsg" aria-live="polite" className="m-0 min-h-lh text-xs leading-snug text-muted">
         {msg}
       </p>
     </Panel>

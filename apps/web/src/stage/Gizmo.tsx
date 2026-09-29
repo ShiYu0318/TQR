@@ -184,7 +184,7 @@ export function Gizmo() {
       role="img"
       aria-label={t("三軸方向儀：點一個軸的端點切換到那個方向")}
       title={t("點一個軸的端點切換到那個方向")}
-      className="size-[88px] self-center touch-none"
+      className="size-22 self-center touch-none"
     />
   );
 }

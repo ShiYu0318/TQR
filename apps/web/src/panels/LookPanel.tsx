@@ -22,7 +22,7 @@ const LOOK_NOTES: Record<Look, string> = {
 function Swatch({ label, value, onChange }: { label: string; value: string; onChange(v: string): void }) {
   return (
     <label className="inline-flex cursor-pointer items-center gap-1.5 text-[12.5px]">
-      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="h-[22px] w-7 cursor-pointer rounded border border-rule bg-transparent p-0" />
+      <input type="color" value={value} onChange={(e) => onChange(e.target.value)} className="h-5.5 w-7 cursor-pointer rounded border border-rule bg-transparent p-0" />
       <span>{t(label)}</span>
     </label>
   );
@@ -123,7 +123,7 @@ export function LookPanel() {
             </Field>
           </div>
           {c.fill === "gradient" ? (
-            <div className="flex basis-full flex-col gap-[7px]">
+            <div className="flex basis-full flex-col gap-1.75">
               <Field label="色系" htmlFor="gradPreset">
                 <select id="gradPreset" className={inputClass} value={c.gradient} onChange={(e) => setColors({ gradient: e.target.value })}>
                   {Object.keys(GRADIENTS).map((k) => (
@@ -168,7 +168,7 @@ export function LookPanel() {
         </Colours>
       )}
       {sil && look.look === "pieces" && (
-        <div className="flex flex-col gap-[7px]">
+        <div className="flex flex-col gap-1.75">
           <Field label="色彩系列" htmlFor="piecePal">
             <select
               id="piecePal"
@@ -184,7 +184,7 @@ export function LookPanel() {
               ))}
             </select>
           </Field>
-          <div aria-hidden="true" className="grid h-3 grid-cols-8 gap-[3px]">
+          <div aria-hidden="true" className="grid h-3 grid-cols-8 gap-0.75">
             {pal.map((h) => (
               <i key={h} className="rounded-[3px]" style={{ background: "#" + h.toString(16).padStart(6, "0") }} />
             ))}

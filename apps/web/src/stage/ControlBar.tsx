@@ -57,7 +57,7 @@ function useLitViews(views: View[]) {
   return new Set(lit ? lit.split(",").map(Number) : []);
 }
 
-const padButton = "border-0 bg-transparent px-2 py-0.5 text-xs leading-[17px] text-muted transition-[background,color,box-shadow] duration-150 hover:text-ink aria-pressed:bg-accent aria-pressed:font-semibold aria-pressed:text-accent-ink aria-pressed:shadow-[0_0_10px_rgba(56,139,253,.55)]";
+const padButton = "border-0 bg-transparent px-2 py-0.5 text-xs leading-4.25 text-muted transition-[background,color,box-shadow] duration-150 hover:text-ink aria-pressed:bg-accent aria-pressed:font-semibold aria-pressed:text-accent-ink aria-pressed:shadow-[0_0_10px_rgba(56,139,253,.55)]";
 const head = "font-mono text-[9.5px] leading-none tracking-wider text-muted text-center uppercase";
 
 export function ControlBar() {
@@ -110,10 +110,10 @@ export function ControlBar() {
       ref={bar}
       role="group"
       aria-label={t("快速視角與相機距離")}
-      className={`${overlay} absolute right-2 bottom-2 left-2 z-[2] flex items-stretch gap-2.5 px-2.5 py-1.5 transition-[opacity,visibility] duration-200 max-[900px]:static ${clean ? "pointer-events-none invisible opacity-0" : ""}`}
+      className={`${overlay} absolute right-2 bottom-2 left-2 z-2 flex items-stretch gap-2.5 px-2.5 py-1.5 transition-[opacity,visibility] duration-200 max-[900px]:static ${clean ? "pointer-events-none invisible opacity-0" : ""}`}
     >
       <div className="flex min-w-0 flex-1 items-end gap-2">
-        <div className="grid gap-[3px]" role="group" aria-label={t("自動旋轉")}>
+        <div className="grid gap-0.75" role="group" aria-label={t("自動旋轉")}>
           <div className={head}>{t("自動旋轉")}</div>
           {SPINS.map((s) => (
             <button
@@ -122,14 +122,14 @@ export function ControlBar() {
               title={t(s.title)}
               aria-pressed={spin === s.mode}
               onClick={() => setCamera({ spin: spin === s.mode ? null : s.mode })}
-              className="flex items-center gap-1.5 rounded-md border border-rule bg-sunk px-2 py-0.5 text-xs leading-[17px] whitespace-nowrap text-muted hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:font-semibold aria-pressed:text-accent-ink"
+              className="flex items-center gap-1.5 rounded-md border border-rule bg-sunk px-2 py-0.5 text-xs leading-4.25 whitespace-nowrap text-muted hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:font-semibold aria-pressed:text-accent-ink"
             >
               {s.icon}
               <span>{t(s.label)}</span>
             </button>
           ))}
         </div>
-        <div className="grid gap-[3px]" id="presets">
+        <div className="grid gap-0.75" id="presets">
           {model === "sil" ? (
             <>
               <div className={`${head} grid grid-cols-2`}>
@@ -145,7 +145,7 @@ export function ControlBar() {
           ) : (
             <>
               <div className={head}>{t("方向")}</div>
-              <div role="group" className="grid grid-cols-[repeat(3,2.4em)] gap-[3px]">
+              <div role="group" className="grid grid-cols-[repeat(3,2.4em)] gap-0.75">
                 {TILE_PAD.map((v, i) => {
                   if (!v) return <span key={i} />;
                   const idx = views.indexOf(v);
@@ -155,7 +155,7 @@ export function ControlBar() {
                       type="button"
                       aria-pressed={lit.has(idx)}
                       onClick={() => go(v)}
-                      className={`${padButton} rounded-md border border-rule !bg-sunk aria-pressed:!bg-accent ${i === 4 ? "rounded-[50%/40%]" : ""}`}
+                      className={`${padButton} rounded-md border border-rule bg-sunk! aria-pressed:bg-accent! ${i === 4 ? "rounded-[50%/40%]" : ""}`}
                     >
                       {t(v[0])}
                     </button>
@@ -165,10 +165,10 @@ export function ControlBar() {
             </>
           )}
         </div>
-        <div className="grid min-w-0 flex-1 gap-[3px]" role="group" aria-label={t("連結")}>
+        <div className="grid min-w-0 flex-1 gap-0.75" role="group" aria-label={t("連結")}>
           <div className={head}>{t("連結")}</div>
           {LINK_ROWS[model].map((keys, r) => (
-            <div key={r} className="flex min-w-0 gap-[3px]">
+            <div key={r} className="flex min-w-0 gap-0.75">
               {keys.map((k) => {
                 const url = linkOf(k);
                 const other = model === "sil" && result && mode !== "3qr" ? (mode === "2qr_wall" ? t("牆") : "Logo") : "-";
@@ -181,7 +181,7 @@ export function ControlBar() {
                     disabled={!url}
                     title={url ? t("{d}：{u}", { d: t(DIR_NAME[k]), u: url }) : undefined}
                     onClick={() => url && go([k, ...VIEW_OF[k], k] as View)}
-                    className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-md border px-2 py-0.5 text-left text-[11.5px] leading-[17px] transition-[background,color,box-shadow] duration-150 disabled:cursor-default disabled:opacity-65 ${
+                    className={`flex min-w-0 flex-1 items-center gap-1.5 rounded-md border px-2 py-0.5 text-left text-[11.5px] leading-4.25 transition-[background,color,box-shadow] duration-150 disabled:cursor-default disabled:opacity-65 ${
                       now
                         ? "border-accent bg-accent text-accent-ink shadow-[0_0_10px_rgba(56,139,253,.55)]"
                         : seen
@@ -189,7 +189,7 @@ export function ControlBar() {
                           : "border-rule bg-sunk text-muted hover:enabled:text-ink"
                     }`}
                   >
-                    <i className={`size-[7px] flex-none rounded-full ${now ? "bg-accent-ink" : seen ? "bg-accent" : "bg-rule"}`} />
+                    <i className={`size-1.75 flex-none rounded-full ${now ? "bg-accent-ink" : seen ? "bg-accent" : "bg-rule"}`} />
                     <span className="truncate font-mono">{text}</span>
                   </button>
                 );

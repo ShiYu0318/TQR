@@ -111,7 +111,7 @@ export function OutputPanel() {
       >
         {t("下載")}
       </button>
-      <p id="dlMsg" aria-live="polite" className={`m-0 min-h-[1lh] text-xs leading-snug ${msg.bad ? "text-bad" : "text-muted"}`}>
+      <p id="dlMsg" aria-live="polite" className={`m-0 min-h-lh text-xs leading-snug ${msg.bad ? "text-bad" : "text-muted"}`}>
         {msg.text}
       </p>
       <Note>{t("3MF 含兩個零件，可直接用雙色印表機。")}</Note>
