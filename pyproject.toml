@@ -1,12 +1,19 @@
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "tqr"
 version = "0.1.0"
 description = "Multi-view QR sculptures: silhouette sculptures and five-view egg-crate tiles"
+readme = "README.md"
 requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Huang Shi-Yu" }]
+
+[project.urls]
+Repository = "https://github.com/ShiYu0318/TQR"
 
 [tool.setuptools.packages.find]
 where = ["src"]

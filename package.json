@@ -2,25 +2,27 @@
   "name": "tqr",
   "version": "0.1.0",
   "private": true,
-  "description": "Multi-view QR sculptures: JS solver tests, browser tests, and the TQR Studio web app",
+  "description": "TQR: physical objects that show a different QR code from each viewing direction",
+  "license": "Apache-2.0",
+  "author": "Huang Shi-Yu (https://github.com/ShiYu0318)",
+  "homepage": "https://github.com/ShiYu0318/TQR#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiYu0318/TQR.git"
+  },
   "workspaces": [
     "apps/web",
     "packages/*"
   ],
   "scripts": {
+    "test": "npm test -w @tqr/tri-core && npm test -w @tqr/web",
     "test:js": "node tests/jstest.js",
-    "test:unit": "npm test -w @tqr/tri-core && npm test -w @tqr/web",
-    "test:e2e": "echo not included",
-    "build:extra": "echo not included",
     "dev:web": "npm run dev -w @tqr/web",
     "build:web": "npm run build -w @tqr/web",
-    "build:demo": "npm run build:demo -w @tqr/web"
+    "build:demo": "npm run build:demo -w @tqr/web",
+    "brand": "node scripts/make_brand.mjs"
   },
   "devDependencies": {
-    "@zxing/library": "0.21.3",
-    "jsqr": "1.4.0",
-    "playwright": "1.56.0",
-    "qrcode-generator": "1.4.4",
-    "three": "0.147.0"
+    "playwright": "1.56.0"
   }
 }

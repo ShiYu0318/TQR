@@ -1,0 +1,17 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "TQR Studio"
+abstract: "A browser app for designing physical objects that show a different QR code from each viewing direction."
+type: software
+authors:
+  - family-names: "Huang"
+    given-names: "Shi-Yu"
+    alias: "ShiYu0318"
+repository-code: "https://github.com/ShiYu0318/TQR"
+license: Apache-2.0
+version: "0.1.0"
+date-released: "2026-09-30"
+keywords:
+  - QR code
+  - 3D printing
+  - computational fabrication
