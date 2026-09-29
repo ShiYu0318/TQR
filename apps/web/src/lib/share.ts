@@ -135,6 +135,12 @@ export function shareUrl() {
 export function applySharedHash(): string {
   const h = location.hash.slice(1);
   if (!h.startsWith("s1.")) return "";
+  // applied once: later edits are the viewer's own draft, so a reload must not bring the link back
+  try {
+    history.replaceState(null, "", location.pathname + location.search);
+  } catch {
+    /* some hosts refuse; harmless */
+  }
   try {
     setState(decodeState(h));
     return "已套用分享連結的設定。";
