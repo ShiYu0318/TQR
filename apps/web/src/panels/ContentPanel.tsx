@@ -7,7 +7,7 @@ import { Field, Note, Panel, inputClass } from "@/components/Panel";
 import { t, useT } from "@/i18n";
 
 const VIEW_NAMES = ["上方", "前方", "側面"];
-const LEVELS: [Level, string][] = [["L", "L - 低（7%）"], ["M", "M - 中（15%）"], ["Q", "Q - 四分之一（25%）"], ["H", "H - 高（30%）"]];
+const LEVELS: [Level, string][] = [["L", "L：低（7%）"], ["M", "M：中（15%）"], ["Q", "Q：四分之一（25%）"], ["H", "H：高（30%）"]];
 
 function ContentField({ def, value, onChange }: { def: FieldDef; value: string | boolean | undefined; onChange(v: string | boolean): void }) {
   const id = "cf_" + def.key;

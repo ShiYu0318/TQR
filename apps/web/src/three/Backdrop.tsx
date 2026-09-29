@@ -90,7 +90,7 @@ const WHITE = new THREE.Color(0xffffff);
 const FLOOR_TILT = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), THREE.MathUtils.degToRad(25));
 
 /**
- * Sky, floor and contact shadow. The silhouette sculpture floats, so its floor behaves like a turntable studio: it
+ * Sky, floor and contact shadow. The silhouette sculpture floats, so its floor behaves like a photo studio's: it
  * stays put on screen, seen from 25° above and right under the model, whichever way the model turns. The egg-crate
  * tile really lies on its floor, so there the floor stays fixed in the world.
  */
@@ -124,7 +124,7 @@ export function Backdrop({ backdrop, backlit, floor, model, size, footprint }: P
       return;
     }
     group.current.quaternion.copy(camera.quaternion).multiply(FLOOR_TILT);
-    // sit the floor just under the cube's lowest point along the tilted up direction (0.5-0.87 of its side deep)
+    // sit the floor just under the cube's lowest point along the tilted up direction (0.5 to 0.87 of its side deep)
     up.set(0, 1, 0).applyQuaternion(group.current.quaternion);
     const low = (S / 2) * (Math.abs(up.x) + Math.abs(up.y) + Math.abs(up.z));
     floorMesh.current.position.y = -low - 0.8;

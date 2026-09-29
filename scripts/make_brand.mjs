@@ -23,7 +23,7 @@ const C = Math.sqrt(3) / 2;
 const f2 = (v) => +v.toFixed(2);
 const pts = (p) => p.map(([x, y]) => `${f2(x)},${f2(y)}`).join(" ");
 
-// ---------- the mark, drawn in a 120×120 box (cube spans x 20.2-99.8, y 16-108)
+// ---------- the mark, drawn in a 120×120 box (cube spans x 20.2 to 99.8, y 16 to 108)
 function markBody() {
   const V = [60, 62], L = 46, [x, y] = V;
   const faces = {

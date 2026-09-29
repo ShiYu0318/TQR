@@ -1,5 +1,4 @@
-// Share links, saved settings and settings files. The format is the reference app's v1
-// (getState/setState), so links and files from either one open in the other. The hash is a bare token
+// Share links, saved settings and settings files, all in one versioned format (v1). The hash is a bare token
 // (#s1.<base64url JSON>) so it survives hosts that only keep plain #anchors.
 import { useStudio, type Content, type Design, type Look, type Model, type Shape } from "@/store";
 import type { Level, Mode } from "@tqr/tri-core";

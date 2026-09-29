@@ -18,7 +18,7 @@ function LiveCamera() {
   return null;
 }
 
-// three.js now measures light in physical units; × π gives the old (legacy) brightness the reference app was tuned for
+// three.js now measures light in physical units; × π gives the legacy brightness the colours were tuned for
 const LEGACY = Math.PI;
 
 /** a light that rides with the camera, so the face you look at is never in shadow */

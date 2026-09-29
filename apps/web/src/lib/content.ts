@@ -1,5 +1,5 @@
 // What each QR view encodes: a content type and its fields, turned into the standard payload scanners understand.
-// Same types and encodings as the reference app (tested in content.test.ts).
+// Tested in content.test.ts.
 import { t } from "@/i18n";
 
 export type FieldKind = "text" | "area" | "select" | "check" | "date" | "time";

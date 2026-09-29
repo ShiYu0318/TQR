@@ -1,4 +1,4 @@
-// Printable meshes, the same pipeline as src/tqr/export_manifold.py and the reference app: fine voxel mask → greedy
+// Printable meshes: fine voxel mask → greedy
 // box decomposition → exact union with manifold (WebAssembly, loaded on first use) → vertices welded at float32.
 import type { Result } from "@tqr/tri-core";
 
@@ -59,7 +59,7 @@ export function sculptureMask(r: Result, k: number, keep?: (cell: number) => boo
   return { F, N };
 }
 
-/** struts one fine voxel wide on module-corner lines (as strut_fine in tri.py) */
+/** struts one fine voxel wide on module-corner lines */
 export function addStruts(F: Uint8Array, N: number, r: Result, k: number) {
   const n = r.n, n2 = n * n, fine = (c: number) => [((c / n2) | 0) * k, (((c / n) | 0) % n) * k, (c % n) * k];
   for (const [u, v] of r.E ?? []) {

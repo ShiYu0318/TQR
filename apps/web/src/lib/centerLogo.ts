@@ -1,6 +1,6 @@
-// A logo in the middle of each QR view (F8 + N10). The logo is drawn in the QR's own module grid (row = first view
+// A logo in the middle of each QR view. The logo is drawn in the QR's own module grid (row = first view
 // coordinate), so it reads upright like the code. The solver counts the codewords it changes against the error
-// correction first and bridges only with what is left, so the views stay certified. Same logic as the reference app.
+// correction first and bridges only with what is left, so the views stay certified.
 import { t } from "@/i18n";
 
 export type CenterKind = "none" | "text" | "image";

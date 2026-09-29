@@ -9,3 +9,8 @@ JS = ROOT / "src" / "js"                          # tri_core.js, qr_tables.json
 DATA = ROOT / "experiments" / "data"              # *.json, *.npy produced by experiments
 FIGURES = ROOT / "experiments" / "figures"        # experiment screenshots and renders
 MODELS = ROOT / "models"                          # printable STL files
+
+try:  # extra paths of a local checkout, if it defines any
+    from ._local_paths import *  # noqa: F401,F403
+except ImportError:
+    pass

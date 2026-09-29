@@ -4,6 +4,13 @@
   "private": true,
   "type": "module",
   "description": "TQR Studio as a web app (Vite + React + TypeScript)",
+  "license": "Apache-2.0",
+  "author": "Huang Shi-Yu (https://github.com/ShiYu0318)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiYu0318/TQR.git",
+    "directory": "apps/web"
+  },
   "scripts": {
     "dev": "vite",
     "build": "npm run typecheck && vite build",

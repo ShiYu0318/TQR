@@ -1,5 +1,5 @@
-// UI language. Strings are keyed by their Traditional Chinese original (as in the reference app), so Chinese needs no
-// table and a missing English entry falls back to Chinese. en.json began as the reference app's EN table.
+// UI language. Strings are keyed by their Traditional Chinese original, so Chinese needs no table and a missing
+// English entry falls back to Chinese.
 import i18next from "i18next";
 import { initReactI18next, useTranslation } from "react-i18next";
 import en from "./en.json";
@@ -12,7 +12,7 @@ void i18next.use(initReactI18next).init({
   fallbackLng: false,
   keySeparator: false,
   nsSeparator: false,
-  // {name}, as the reference app writes placeholders
+  // placeholders are written {name}
   interpolation: { prefix: "{", suffix: "}", escapeValue: false },
   returnEmptyString: false,
   initAsync: false,

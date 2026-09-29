@@ -1,6 +1,6 @@
 import type { Result } from "@tqr/tri-core";
 
-// Voxel (x, y, z) sits at (x − n/2, z − n/2, −(y − n/2)) · module in three.js (invariant):
+// Voxel (x, y, z) sits at (x − n/2, z − n/2, −(y − n/2)) · module in three.js:
 // three's y is the sculpture's height and the front camera looks along +z.
 
 /** the occupied cells of a result, in index order */
@@ -32,7 +32,7 @@ export function strutBox(a: number, b: number, n: number, s: number, w: number) 
   };
 }
 
-/** Camera distance that keeps the parallax limit (d ≳ N²·s/0.6) for this sculpture, in cm, clamped to 4-10 m. */
+/** Default camera distance for this sculpture, in cm, clamped to 4-10 m. */
 export function farDistanceCm(n: number, s: number): number {
   return Math.min(1000, Math.max(400, Math.ceil((1.4 * n * n * s) / 0.6 / 10 / 50) * 50));
 }

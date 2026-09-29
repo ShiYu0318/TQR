@@ -1,4 +1,4 @@
-// Stage button icons (24×24, stroke), the same paths as the reference app.
+// Stage button icons (24×24, stroke).
 const base = { viewBox: "0 0 24 24", width: 17, height: 17, fill: "none", stroke: "currentColor", strokeWidth: 2,
                strokeLinecap: "round", strokeLinejoin: "round", "aria-hidden": true } as const;
 

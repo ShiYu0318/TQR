@@ -4,9 +4,22 @@
   "private": true,
   "type": "module",
   "description": "Typed ES-module view of the TQR solver in src/js/tri_core.js (no copy of the solver)",
+  "license": "Apache-2.0",
+  "author": "Huang Shi-Yu (https://github.com/ShiYu0318)",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShiYu0318/TQR.git",
+    "directory": "packages/tri-core"
+  },
   "exports": {
-    ".": { "types": "./index.d.ts", "default": "./index.js" },
-    "./vite": { "types": "./vite.d.ts", "default": "./vite.js" }
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
+    "./vite": {
+      "types": "./vite.d.ts",
+      "default": "./vite.js"
+    }
   },
   "scripts": {
     "test": "vitest run"

@@ -1,15 +1,7 @@
-// Share tokens must round-trip, and must stay readable by (and read) the reference app's own encoder.
+// Share tokens must round-trip, and unknown or broken settings must not get in.
 import { describe, expect, it } from "vitest";
 import { useStudio } from "@/store";
-import { decodeState, encodeState, getState, setState, type SavedState } from "./share";
-import { cut, studioSource } from "@/testing/studio";
-
-const studio = studioSource
-  ? (new Function(cut("const b64url", "function shareMsg") + "return {encodeState, decodeState};")() as {
-      encodeState(s: object): string;
-      decodeState(t: string): SavedState;
-    })
-  : null;
+import { decodeState, encodeState, getState, setState } from "./share";
 
 describe("share tokens", () => {
   it("round-trip the whole design, look and module sizes", () => {
@@ -28,11 +20,6 @@ describe("share tokens", () => {
     expect(getState()).not.toEqual(before);
     setState(decodeState(tok));
     expect(getState()).toEqual(before);
-  });
-  it.skipIf(!studio)("is the reference app's format", () => {
-    const s = getState();
-    expect(studio!.decodeState(encodeState(s))).toEqual(s);
-    expect(decodeState(studio!.encodeState(s))).toEqual(s);
   });
   it("rejects what is not v1 settings and ignores unknown values", () => {
     expect(() => setState(null)).toThrow();

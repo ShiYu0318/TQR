@@ -1,4 +1,4 @@
-// Colour tables shared by the 3D view and the appearance panel; values match the reference app.
+// Colour tables shared by the 3D view and the appearance panel.
 
 export interface Backdrop {
   /** sky gradient stops, top to bottom */

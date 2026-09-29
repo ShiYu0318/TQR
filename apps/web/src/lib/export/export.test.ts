@@ -1,74 +1,46 @@
-// Export must match the reference app: run the studio's own mesh and 2D functions against this port, then check the
-// file writers and a real manifold union.
+// Export on synthetic shapes: box decomposition, welding, the file writers, the silhouette SVG and a real manifold
+// union, so these run without any generated model.
 import { describe, expect, it } from "vitest";
-import TRI, { type Result } from "@tqr/tri-core";
-import ref from "../../../../../tests/fixtures/js_ref.json";
-import { addStruts, boxesFromMask, sculptureMask, sculptureParts, unionBoxes, weldMesh } from "./mesh";
+import { boxesFromMask, unionBoxes, weldMesh } from "./mesh";
 import { crc32, stlBinary, zipStore } from "./formats";
 import { silhouetteImage, silhouetteSvg } from "./twoD";
-import { cut, studioSource } from "@/testing/studio";
 
-const studio = studioSource
-  ? (new Function(
-      cut("function boxesFromMask", "async function unionBoxes") +
-        cut("function sculptureMask", "async function modelParts") +
-        "return {boxesFromMask, weldMesh, sculptureMask, addStruts};",
-    )() as {
-      boxesFromMask: typeof boxesFromMask;
-      weldMesh: typeof weldMesh;
-      sculptureMask: typeof sculptureMask;
-      addStruts: typeof addStruts;
-    })
-  : null;
-// the studio reads the generated result from a global GEN
-const studioSilhouette = (r: Result, view: number) =>
-  new Function("GEN", cut("function silhouetteImage", "function qrExport") + "return silhouetteImage;")({ r })(view) as { n: number; S: Uint8Array };
+// an L-shaped plate with a hole and a separate post, in a 6×6×6 grid
+const N = 6, idx = (x: number, y: number, z: number) => (x * N + y) * N + z;
+const mask = new Uint8Array(N * N * N);
+for (let x = 0; x < 5; x++) for (let y = 0; y < 5; y++) if (x < 2 || y < 2) mask[idx(x, y, 0)] = mask[idx(x, y, 1)] = 1;
+mask[idx(0, 0, 0)] = 0;
+for (let z = 0; z < 6; z++) mask[idx(5, 5, z)] = 1;
 
-const qr = ref.demo.qr.map((m) => Uint8Array.from(m));
-const result = TRI.generate({ qr, version: ref.demo.version, level: "H", mode: "3qr", method: "bridge+strut", budget: 0.5 });
-
-describe.skipIf(!studio)("mesh pipeline matches the reference app", () => {
-  for (const k of [2, 4, 5]) {
-    it(`fine mask, struts and boxes at k=${k}`, () => {
-      const mine = sculptureMask(result, k), theirs = studio!.sculptureMask(result, k);
-      addStruts(mine.F, mine.N, result, k);
-      studio!.addStruts(theirs.F, theirs.N, result, k);
-      expect(mine.N).toBe(theirs.N);
-      expect(Buffer.from(mine.F).equals(Buffer.from(theirs.F))).toBe(true);
-      expect(boxesFromMask(mine.F, mine.N, mine.N, mine.N)).toEqual(studio!.boxesFromMask(theirs.F, theirs.N, theirs.N, theirs.N));
-    });
-  }
-  it("welds like the studio", () => {
+describe("mesh building blocks", () => {
+  it("boxes cover exactly the mask", () => {
+    const cover = new Uint8Array(mask.length);
+    for (const [x0, y0, z0, x1, y1, z1] of boxesFromMask(mask, N, N, N))
+      for (let a = x0; a < x1; a++) for (let b = y0; b < y1; b++) for (let c = z0; c < z1; c++) cover[idx(a, b, c)]++;
+    expect(Array.from(cover)).toEqual(Array.from(mask));
+  });
+  it("merges boxes greedily along x, then y, then z", () => {
+    const solid = new Uint8Array(8).fill(1);
+    expect(boxesFromMask(solid, 2, 2, 2)).toEqual([[0, 0, 0, 2, 2, 2]]);
+  });
+  it("welds vertices at float32 positions and reports open edges", () => {
     // two triangles sharing an edge, one vertex repeated at a float32-equal position
     const vp = [0, 0, 0, 1, 0, 0, 0, 1, 0, 1 + 1e-12, 0, 0, 1, 1, 0, 0, 1, 0];
-    const tv = [0, 1, 2, 3, 4, 5];
-    const mine = weldMesh(vp, 3, tv), theirs = studio!.weldMesh(vp, 3, tv);
-    expect(Array.from(mine.verts)).toEqual(Array.from(theirs.verts));
-    expect(Array.from(mine.tris)).toEqual(Array.from(theirs.tris));
-    expect(mine.verts.length).toBe(12);
-    expect(mine.closed).toBe(false);
+    const m = weldMesh(vp, 3, [0, 1, 2, 3, 4, 5]);
+    expect(m.verts.length).toBe(12);
+    expect(Array.from(m.tris)).toEqual([0, 1, 2, 1, 3, 2]);
+    expect(m.closed).toBe(false);
   });
-  for (const view of [0, 1, 2])
-    it(`silhouette of view ${view}`, () => {
-      const mine = silhouetteImage(result, view), theirs = studioSilhouette(result, view);
-      expect(mine.n).toBe(theirs.n);
-      expect(Array.from(mine.S)).toEqual(Array.from(theirs.S));
-    });
 });
 
-describe("silhouette is the QR it encodes", () => {
-  it("boxes cover exactly the mask", () => {
-    const { F, N } = sculptureMask(result, 2), cover = new Uint8Array(F.length);
-    for (const [x0, y0, z0, x1, y1, z1] of boxesFromMask(F, N, N, N))
-      for (let a = x0; a < x1; a++) for (let b = y0; b < y1; b++) for (let c = z0; c < z1; c++) cover[(a * N + b) * N + c]++;
-    expect(Array.from(cover)).toEqual(Array.from(F));
-  });
-  it("the top view, turned back to QR orientation, is the demo matrix", () => {
-    // top: screen x = n-1-row, screen y = col
-    const { n, S } = silhouetteImage(result, 0), M = qr[0];
-    let diff = 0;
-    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) diff += +(S[c * n + (n - 1 - r)] !== M[r * n + c]);
-    expect(diff).toBeLessThan(n * n * 0.05); // bridges may flip a few data modules, within the error budget
+describe("silhouettes", () => {
+  it("the top view is drawn as seen from the top preset", () => {
+    // n = 2 and a single voxel at x = 0, y = 1: top pixel (0, 1) lands at screen (x = 1, y = 1)
+    const V = new Uint8Array(8);
+    V[(0 * 2 + 1) * 2 + 0] = 1;
+    const { n, S } = silhouetteImage({ n: 2, V }, 0);
+    expect(n).toBe(2);
+    expect(Array.from(S)).toEqual([0, 0, 0, 1]);
   });
   it("svg has a quiet zone and one rect per run", () => {
     const svg = silhouetteSvg(3, Uint8Array.from([1, 1, 0, 0, 0, 0, 1, 0, 1]), 4);
@@ -108,11 +80,9 @@ describe("manifold union (WebAssembly)", () => {
     expect(m.closed).toBe(true);
     expect(m.pieces).toBe(1);
   });
-  it("the demo sculpture's body is a closed mesh", async () => {
-    const [body] = sculptureParts(result, 0.2, 3, new Set(), { model: "#fff", finder: "#000" });
-    const m = await unionBoxes(body.boxes, body.scale);
+  it("the test shape comes out closed, in two pieces", async () => {
+    const m = await unionBoxes(boxesFromMask(mask, N, N, N), 2);
     expect(m.closed).toBe(true);
-    expect(m.pieces).toBe(1);
-    expect(m.tris.length).toBeGreaterThan(1000);
+    expect(m.pieces).toBe(2);
   }, 60_000);
 });
