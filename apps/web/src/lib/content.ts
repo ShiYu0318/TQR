@@ -55,6 +55,7 @@ export const CONTENT_TYPES: Record<string, ContentType> = {
     fields: [f("site", "社群平台", "select", [["facebook", "Facebook"], ["instagram", "Instagram"], ["x", "X (Twitter)"], ["youtube", "YouTube"], ["tiktok", "TikTok"]]),
              f("user", "使用者名稱 / 帳號")],
   },
+  github: { label: "GitHub", fields: [f("user", "使用者或組織", "text", "octocat"), f("repo", "儲存庫（可留空）", "text", "hello-world")] },
   video: { label: "視訊通話", fields: [f("app", "應用程式", "select", [["facetime", "FaceTime"], ["skype", "Skype"]]), f("id", "帳號 / 電話號碼")] },
 };
 
@@ -137,6 +138,13 @@ export function encodeContent(type: string, fv: Values): string {
         youtube: "https://www.youtube.com/@", tiktok: "https://www.tiktok.com/@",
       };
       return base[String(fv.site || "facebook")] + encodeURIComponent(u);
+    }
+    case "github": {
+      // a pasted profile or repository link works too
+      const [user, repo = ""] = v("user").replace(/^(https?:\/\/)?(www\.)?github\.com\//i, "").replace(/^@/, "").split("/").filter(Boolean);
+      if (!user) return "";
+      const r = v("repo").replace(/^\/+|\/+$/g, "") || repo;
+      return "https://github.com/" + encodeURIComponent(user) + (r ? "/" + encodeURIComponent(r) : "");
     }
     case "video":
       if (!v("id")) return "";

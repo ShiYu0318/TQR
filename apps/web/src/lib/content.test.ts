@@ -31,6 +31,10 @@ describe("encodeContent", () => {
     expect(encodeContent("im", { app: "whatsapp", id: "+886 912", msg: "hi" })).toBe("https://wa.me/886912?text=hi");
     expect(encodeContent("im", { app: "line", id: "@tqr" })).toBe("https://line.me/R/ti/p/~tqr");
     expect(encodeContent("social", { site: "youtube", user: "@tqr" })).toBe("https://www.youtube.com/@tqr");
+    expect(encodeContent("github", { user: "ShiYu0318", repo: "TQR" })).toBe("https://github.com/ShiYu0318/TQR");
+    expect(encodeContent("github", { user: "@ShiYu0318" })).toBe("https://github.com/ShiYu0318");
+    expect(encodeContent("github", { user: "https://github.com/ShiYu0318/TQR/" })).toBe("https://github.com/ShiYu0318/TQR");
+    expect(encodeContent("github", { user: "" })).toBe("");
     expect(encodeContent("video", { app: "skype", id: "tqr" })).toBe("skype:tqr?call");
   });
 });
