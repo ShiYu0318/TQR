@@ -36,7 +36,7 @@ export function LeftSidebar() {
             type="button"
             id="gen"
             disabled={busy}
-            onClick={() => void generate()}
+            onClick={() => void generate({ iso: true })}
             className="w-full cursor-pointer rounded-lg border border-accent bg-accent px-2.5 py-2.75 text-[15px] font-bold tracking-[.06em] text-accent-ink disabled:cursor-wait disabled:opacity-55 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
             {t("生成")}
