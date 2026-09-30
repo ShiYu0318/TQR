@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useThree } from "@react-three/fiber";
 import { TILE } from "@/lib/tile";
 
 const unit = new THREE.BoxGeometry(1, 1, 1);
@@ -9,6 +10,7 @@ function Filament({ boxes, colour }: { boxes: number[]; colour: string }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
   const material = useMemo(() => new THREE.MeshLambertMaterial(), []);
   const count = boxes.length / 6, { vox, dims } = TILE;
+  const invalidate = useThree((s) => s.invalidate);
   useLayoutEffect(() => {
     const m = new THREE.Matrix4(), p = new THREE.Vector3(), s = new THREE.Vector3(), q = new THREE.Quaternion();
     for (let i = 0; i < count; i++) {
@@ -19,8 +21,12 @@ function Filament({ boxes, colour }: { boxes: number[]; colour: string }) {
     }
     mesh.current!.instanceMatrix.needsUpdate = true;
     mesh.current!.computeBoundingSphere();
-  }, [boxes, count, vox, dims]);
-  useLayoutEffect(() => void material.color.set(colour), [material, colour]);
+    invalidate();
+  }, [boxes, count, vox, dims, invalidate]);
+  useLayoutEffect(() => {
+    material.color.set(colour);
+    invalidate();
+  }, [material, colour, invalidate]);
   return <instancedMesh ref={mesh} args={[unit, material, count]} />;
 }
 

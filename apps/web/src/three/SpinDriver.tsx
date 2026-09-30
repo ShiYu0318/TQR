@@ -31,8 +31,9 @@ export function SpinDriver() {
     controls?.update();
   }, [spin, camera, controls]);
 
-  useFrame((_, delta) => {
+  useFrame(({ invalidate }, delta) => {
     if (!spin) return;
+    invalidate(); // the canvas draws on demand: keep asking while spinning
     const s = state.current, speed = useStudio.getState().camera.spinSpeed, tile = model === "tile";
     s.t += speed * Math.min(0.1, delta);
     let az = s.az, th: number;

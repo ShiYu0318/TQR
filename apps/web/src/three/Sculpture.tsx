@@ -1,5 +1,6 @@
 import { useLayoutEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
+import { useThree } from "@react-three/fiber";
 import type { Result } from "@tqr/tri-core";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import type { Look, Shape } from "@/store";
@@ -37,6 +38,7 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors, shape }:
   const struts = useRef<THREE.InstancedMesh>(null);
   const cells = useMemo(() => occupiedCells(result), [result]);
   const facts = useMemo(() => cellFacts(result, cells), [result, cells]);
+  const invalidate = useThree((s) => s.invalidate);
 
   useLayoutEffect(() => {
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), p = new THREE.Vector3(), sc = new THREE.Vector3();
@@ -57,10 +59,12 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors, shape }:
       struts.current.instanceMatrix.needsUpdate = true;
       struts.current.computeBoundingSphere();
     }
-  }, [result, cells, moduleMm, strutWidth, shape]);
+    invalidate();
+  }, [result, cells, moduleMm, strutWidth, shape, invalidate]);
 
   useLayoutEffect(() => {
     if (!cubes.current || !struts.current) return;
+    invalidate();
     const paint = colourCells(look, result, cells, facts, colors);
     if (!paint) {
       cubes.current.material = SILHOUETTE;
@@ -73,7 +77,7 @@ export function Sculpture({ result, moduleMm, strutWidth, look, colors, shape }:
     const col = new THREE.Color();
     for (let i = 0; i < cells.length; i++) cubes.current.setColorAt(i, col.fromArray(paint.cubes, i * 3));
     if (cubes.current.instanceColor) cubes.current.instanceColor.needsUpdate = true;
-  }, [look, colors, result, cells, facts, shape]);
+  }, [look, colors, result, cells, facts, shape, invalidate]);
 
   return (
     <group>

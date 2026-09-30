@@ -97,6 +97,7 @@ const FLOOR_TILT = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 
 export function Backdrop({ backdrop, backlit, floor, model, size, footprint }: Props) {
   const scene = useThree((s) => s.scene);
   const camera = useThree((s) => s.camera);
+  const invalidate = useThree((s) => s.invalidate);
   const spec = BACKDROPS[backdrop] ?? BACKDROPS.graphite;
   const sky = useMemo(() => skyTexture(spec.sky), [spec]);
   const floorMap = useMemo(() => floorTexture(spec), [spec]);
@@ -107,7 +108,8 @@ export function Backdrop({ backdrop, backlit, floor, model, size, footprint }: P
   useEffect(() => () => [sky, floorMap, shadowMap].forEach((t) => t.dispose()), [sky, floorMap, shadowMap]);
   useEffect(() => {
     scene.background = backlit ? WHITE : sky;
-  }, [scene, backlit, sky]);
+    invalidate();
+  }, [scene, backlit, sky, invalidate]);
 
   const group = useRef<THREE.Group>(null);
   const floorMesh = useRef<THREE.Mesh>(null);

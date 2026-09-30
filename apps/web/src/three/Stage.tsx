@@ -18,6 +18,13 @@ function LiveCamera() {
   return null;
 }
 
+/** the canvas draws only when asked; any change to the studio state asks for a frame (several in one frame count once) */
+function RedrawOnChange() {
+  const invalidate = useThree((s) => s.invalidate);
+  useEffect(() => useStudio.subscribe(() => invalidate()), [invalidate]);
+  return null;
+}
+
 // three.js now measures light in physical units; × π gives the legacy brightness the colours were tuned for
 const LEGACY = Math.PI;
 
@@ -25,17 +32,19 @@ const LEGACY = Math.PI;
 function HeadLight() {
   const camera = useThree((s) => s.camera);
   const scene = useThree((s) => s.scene);
+  const invalidate = useThree((s) => s.invalidate);
   useEffect(() => {
     const light = new THREE.DirectionalLight(0xffffff, 0.45 * LEGACY);
     light.position.set(0, 0, 1);
     camera.add(light, light.target);
     scene.add(camera);
+    invalidate();
     return () => void camera.remove(light, light.target);
-  }, [camera, scene]);
+  }, [camera, scene, invalidate]);
   return null;
 }
 
-/** The 3D view. Lengths are in mm. */
+/** The 3D view, drawn on demand: while nothing moves or changes it costs nothing. Lengths are in mm. */
 export function Stage() {
   const t = useT();
   const result = useStudio((s) => s.result);
@@ -55,8 +64,9 @@ export function Stage() {
     <Canvas
       className="block h-full w-full touch-none"
       flat
-      gl={{ antialias: true, preserveDrawingBuffer: true }}
-      dpr={[1, 3]}
+      frameloop="demand"
+      gl={{ antialias: true }}
+      dpr={[1, 2]}
       camera={{ position: [0, 0, -6000], fov: 1, near: 1, far: 10000 }}
       aria-label={t("可拖曳旋轉的 3D 模型")}
     >
@@ -74,6 +84,7 @@ export function Stage() {
       <SpinDriver />
       <Scanner backlitForScan={model === "sil" && look.look !== "sil"} />
       <LiveCamera />
+      <RedrawOnChange />
     </Canvas>
   );
 }
