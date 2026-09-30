@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 import { useStudio } from "@/store";
 import { Stage } from "@/three/Stage";
 import { cmToSlider, sliderToCm } from "@/three/live";
@@ -56,11 +57,13 @@ export function StageView() {
 
   // ---- scanning: once the view settles (or often, lightly, while it spins), and whenever the model or look changes
   useEffect(() => {
-    let last = "";
+    const last = new THREE.Vector3(NaN, NaN, NaN);
+    let lastCm = NaN;
     return subscribeLive(() => {
-      const s = useStudio.getState(), key = live.dir.toArray().map((v) => v.toFixed(4)).join() + s.camera.distanceCm;
-      if (key === last) return;
-      last = key;
+      const s = useStudio.getState();
+      if (last.distanceToSquared(live.dir) < 1e-8 && lastCm === s.camera.distanceCm) return;
+      last.copy(live.dir);
+      lastCm = s.camera.distanceCm;
       if (s.camera.spin) scheduleScan(150, true);
       else scheduleScan(220);
     });

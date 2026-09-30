@@ -21,6 +21,7 @@ const TILE_PAD: (View | null)[] = [
   ["西", 270, 40, "W"], ["上", 0, 90, "T"], ["東", 90, 40, "E"],
   null, ["南", 180, 40, "S"], null,
 ];
+const VIEWS: Record<Model, View[]> = { sil: SIL_PAD.flat(), tile: TILE_PAD.filter(Boolean) as View[] };
 const LINK_ROWS: Record<Model, string[][]> = { sil: [["top"], ["front"], ["side"]], tile: [["T"], ["N", "S"], ["W", "E"]] };
 const VIEW_OF: Record<string, [number, number]> = {
   top: [0, 90], front: [0, 0], side: [90, 0], T: [0, 90], N: [0, 40], S: [180, 40], W: [270, 40], E: [90, 40],
@@ -74,7 +75,7 @@ export function ControlBar() {
   const clean = useStudio((s) => s.clean);
   const bar = useRef<HTMLDivElement>(null);
 
-  const views = model === "sil" ? SIL_PAD.flat() : (TILE_PAD.filter(Boolean) as View[]);
+  const views = VIEWS[model]; // one array per model, so the camera subscription below is not renewed on every render
   const lit = useLitViews(views);
   const litKeys = new Set([...lit].map((i) => views[i][3]));
 
