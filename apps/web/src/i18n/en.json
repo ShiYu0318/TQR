@@ -141,7 +141,6 @@
  "水平位置": "Horizontal",
  "垂直位置": "Vertical",
  "放在哪些方向": "Views with the logo",
- "Logo 預覽": "Logo preview",
  "預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。": "Preview of the QR as seen from the top; the logo is blue. Codewords the logo changes are taken out of the error correction first and bridges only use what is left, so decoding stays certified.",
  "Logo 太大：{view}的第 {b} 區塊要改動 {x} 個碼字，但只能更正 {c} 個。請縮小 Logo、改用「字外框」或「透明底」，或加大 QR 版本。": "Logo too large: block {b} of the {view} view would change {x} codewords but can only correct {c}. Make the logo smaller, use Outline or Transparent, or pick a larger QR version.",
  "Logo 用掉 {u}": "Logo uses {u}",
