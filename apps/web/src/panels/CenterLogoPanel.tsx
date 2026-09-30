@@ -45,7 +45,7 @@ function Preview({ L }: { L: CenterLogo }) {
         g.fillRect((n - 1 - r + 2) * s, (c + 2) * s, Math.ceil(s), Math.ceil(s));
       }
   }, [L, design.content, design.version, design.level]);
-  return <canvas ref={canvas} width={120} height={120} aria-label={t("中央 Logo 預覽")} className="size-30 flex-none rounded border border-rule [image-rendering:pixelated]" />;
+  return <canvas ref={canvas} width={120} height={120} aria-label={t("Logo 預覽")} className="size-30 flex-none rounded border border-rule [image-rendering:pixelated]" />;
 }
 
 export function CenterLogoPanel() {
@@ -67,7 +67,7 @@ export function CenterLogoPanel() {
   };
 
   return (
-    <Panel id="logo" title="中央 Logo" side="left">
+    <Panel id="logo" title="Logo" side="left">
       <Field label="Logo 類型" htmlFor="clKind">
         <select id="clKind" className={inputClass} value={L.kind} onChange={(e) => set({ kind: e.target.value as CenterLogo["kind"] })}>
           <option value="none">{t("不放 Logo")}</option>
