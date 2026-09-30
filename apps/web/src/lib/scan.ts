@@ -37,7 +37,7 @@ export async function scanNow(quick = false): Promise<string | null> {
 
 async function scanOnce(quick: boolean): Promise<string | null> {
   if (!captureScan) return null;
-  const image = captureScan();
+  const image = await captureScan();
   const text = await scanWorker().scan(Comlink.transfer(image, [image.data.buffer]), quick);
   const s = useStudio.getState();
   const links: Record<string, string | undefined> = s.model === "sil" ? { top: s.links[0], front: s.links[1], side: s.links[2] } : TILE.links;

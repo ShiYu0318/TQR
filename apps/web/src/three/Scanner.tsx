@@ -4,17 +4,19 @@ import * as THREE from "three";
 import { SILHOUETTE } from "./Sculpture";
 
 /** renders the frame a scanner would see and returns its pixels; set by <Scanner/> while the canvas lives */
-export let captureScan: (() => ImageData) | null = null;
+export let captureScan: (() => Promise<ImageData>) | null = null;
 /** the view exactly as on screen, as a PNG; set by <Scanner/> while the canvas lives */
 export let captureView: (() => Promise<Blob>) | null = null;
 
 const WHITE = new THREE.Color(0xffffff);
 const MIN_WIDTH = 900; // rendered frames below ~900 px wide decode poorly
+const MAX_WIDTH = 1200; // the decoder halves the frame first anyway; more pixels only cost read-back and decode time
 
 /**
  * What a scanner sees of the sculpture is its backlit silhouette, whatever look is on screen: for another look, draw
  * that silhouette (black cubes, white field, no floor) into an off-screen target at least 900 px wide, read it, and
- * put the look back. The on-screen canvas is never touched, so nothing flickers.
+ * put the look back. The on-screen canvas is never touched, so nothing flickers. The frame is read back
+ * asynchronously, so the page never waits for the GPU to finish it.
  */
 export function Scanner({ backlitForScan }: { backlitForScan: boolean }) {
   const gl = useThree((s) => s.gl);
@@ -24,10 +26,10 @@ export function Scanner({ backlitForScan }: { backlitForScan: boolean }) {
 
   useEffect(() => {
     const aspect = size.width / Math.max(1, size.height);
-    const w = Math.max(MIN_WIDTH, Math.round(size.width * gl.getPixelRatio())), h = Math.round(w / aspect);
+    const w = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, Math.round(size.width * gl.getPixelRatio()))), h = Math.round(w / aspect);
     const target = new THREE.WebGLRenderTarget(w, h, { colorSpace: THREE.SRGBColorSpace, samples: 4 });
-    const buffer = new Uint8Array(w * h * 4), flipped = new Uint8ClampedArray(w * h * 4);
-    captureScan = () => {
+    const buffer = new Uint8Array(w * h * 4);
+    captureScan = async () => {
       const swaps: [THREE.Mesh, THREE.Material | THREE.Material[]][] = [];
       const background = scene.background, hidden: THREE.Object3D[] = [];
       if (backlitForScan) {
@@ -39,13 +41,14 @@ export function Scanner({ backlitForScan }: { backlitForScan: boolean }) {
       }
       gl.setRenderTarget(target);
       gl.render(scene, camera);
-      gl.readRenderTargetPixels(target, 0, 0, w, h, buffer);
       gl.setRenderTarget(null);
       swaps.forEach(([m, mat]) => (m.material = mat));
       hidden.forEach((o) => (o.visible = true));
       scene.background = background;
+      await gl.readRenderTargetPixelsAsync(target, 0, 0, w, h, buffer);
+      const flipped = new Uint8ClampedArray(w * h * 4); // handed over to the scan worker
       for (let y = 0; y < h; y++) flipped.set(buffer.subarray((h - 1 - y) * w * 4, (h - y) * w * 4), y * w * 4); // GL rows run bottom-up
-      return new ImageData(new Uint8ClampedArray(flipped), w, h);
+      return new ImageData(flipped, w, h);
     };
     captureView = () => {
       gl.render(scene, camera);
