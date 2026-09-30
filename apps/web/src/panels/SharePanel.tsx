@@ -4,6 +4,7 @@ import { Note, Panel, PanelIcon, buttonClass, inputClass } from "@/components/Pa
 import { shareLink } from "@/lib/share";
 import { qrSvg } from "@/lib/qr";
 import { saveBlob } from "@/lib/export/formats";
+import { shareCard } from "@/lib/shareCard";
 import { live, subscribeLive } from "@/three/live";
 import { t, useT } from "@/i18n";
 
@@ -75,6 +76,26 @@ export function SharePanel() {
     else fallback();
   };
 
+  const saveCard = async () => {
+    const text = stale ? await fresh() : link;
+    saveBlob(await shareCard(text), "tqr-share.png");
+    setMsg(t("已下載分享圖卡 tqr-share.png。"));
+  };
+  // the system share sheet (phones, some desktops): the card and the link together when files can be shared
+  const canShare = typeof navigator.share === "function";
+  const systemShare = async () => {
+    const url = stale ? await fresh() : link;
+    try {
+      const data: ShareData = { title: "TQR Studio", text: t("用 TQR Studio 做的多視角 QR 設計"), url };
+      const card = new File([await shareCard(url)], "tqr-share.png", { type: "image/png" });
+      if (navigator.canShare?.({ files: [card] })) data.files = [card];
+      await navigator.share(data);
+      setMsg(t("已交給系統的分享選單。"));
+    } catch (e) {
+      if ((e as Error).name !== "AbortError") setMsg(t("無法開啟系統的分享選單，可以改用複製連結。"));
+    }
+  };
+
   return (
     <Panel id="share" title="分享" side="right">
       <button type="button" id="shareBtn" className={buttonClass} onClick={() => void copy()}>
@@ -85,6 +106,16 @@ export function SharePanel() {
         </PanelIcon>
         <span>{t("複製分享連結")}</span>
       </button>
+      <div className="flex gap-2">
+        <button type="button" id="shareCard" className={buttonClass} onClick={() => void saveCard()}>
+          {t("下載分享圖卡")}
+        </button>
+        {canShare && (
+          <button type="button" id="shareSystem" className={buttonClass} onClick={() => void systemShare()}>
+            {t("分享…")}
+          </button>
+        )}
+      </div>
       <label className="flex cursor-pointer items-start gap-2 text-[12.5px] leading-snug">
         <input type="checkbox" id="shareView" className="mt-0.5 accent-accent" checked={withView} onChange={(e) => setWithView(e.target.checked)} />
         {t("連結帶上目前的視角")}
