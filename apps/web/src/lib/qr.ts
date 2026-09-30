@@ -13,6 +13,33 @@ export function qrVersion(text: string, level: Level): number {
   return (q.getModuleCount() - 17) / 4;
 }
 
+/**
+ * An SVG QR code for a link: level M when it fits, else L; null when the text is too long for any QR code. Dark modules
+ * on white with a two-module quiet zone, one path of horizontal runs.
+ */
+export function qrSvg(text: string): { svg: string; version: number; level: Level } | null {
+  for (const level of ["M", "L"] as Level[]) {
+    let version: number;
+    try {
+      version = qrVersion(text, level);
+    } catch {
+      continue;
+    }
+    const M = qrMatrix(text, version, level), n = 17 + 4 * version, q = 2, size = n + 2 * q;
+    let d = "";
+    for (let r = 0; r < n; r++)
+      for (let c = 0; c < n; c++) {
+        if (!M[r * n + c] || (c > 0 && M[r * n + c - 1])) continue;
+        let e = c;
+        while (e + 1 < n && M[r * n + e + 1]) e++;
+        d += `M${c + q} ${r + q}h${e - c + 1}v1h-${e - c + 1}z`;
+      }
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" shape-rendering="crispEdges"><rect width="${size}" height="${size}" fill="#fff"/><path fill="#000" d="${d}"/></svg>`;
+    return { svg, version, level };
+  }
+  return null;
+}
+
 /** n*n matrix, row-major, 1 = dark */
 export function qrMatrix(text: string, version: number, level: Level): Uint8Array {
   const q = qrcode(version as TypeNumber, level);

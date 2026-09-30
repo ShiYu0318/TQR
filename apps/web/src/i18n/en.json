@@ -389,5 +389,10 @@
  "匯出全部": "Export all",
  "匯入": "Import",
  "只匯出目前設計": "Export only this design",
- "連結帶上目前的視角": "Include the current view in the link"
+ "連結帶上目前的視角": "Include the current view in the link",
+ "分享連結的 QR 碼": "QR code of the share link",
+ "用手機掃描就能打開這個設計。": "Scan it with a phone to open this design.",
+ "目前的網址只在這台電腦有效，手機掃了打不開；放上網站後再分享。": "This address only works on this computer, so a phone cannot open it. Share from the published site.",
+ "下載 QR 碼": "Download QR code",
+ "連結太長，放不進 QR 碼。": "The link is too long for a QR code."
 }

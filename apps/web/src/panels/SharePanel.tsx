@@ -1,7 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useStudio } from "@/store";
-import { Panel, PanelIcon, buttonClass, inputClass } from "@/components/Panel";
+import { Note, Panel, PanelIcon, buttonClass, inputClass } from "@/components/Panel";
 import { shareLink } from "@/lib/share";
+import { qrSvg } from "@/lib/qr";
+import { saveBlob } from "@/lib/export/formats";
 import { live, subscribeLive } from "@/three/live";
 import { t, useT } from "@/i18n";
 
@@ -51,6 +53,9 @@ export function SharePanel() {
   const [shown, setShown] = useState("");
   const { link, stale, fresh } = useShareLink(withView);
   const urlBox = useRef<HTMLInputElement>(null);
+  const qr = useMemo(() => (link ? qrSvg(link) : null), [link]);
+  // a link to this computer (a local preview) opens nowhere else
+  const local = /^(localhost|127\.|\[::1\]|0\.0\.0\.0)/.test(location.hostname);
 
   const copy = async () => {
     // a link still catching up with the last edit is computed now; the clipboard may then refuse, so fall back to
@@ -84,6 +89,20 @@ export function SharePanel() {
         <input type="checkbox" id="shareView" className="mt-0.5 accent-accent" checked={withView} onChange={(e) => setWithView(e.target.checked)} />
         {t("連結帶上目前的視角")}
       </label>
+      {qr ? (
+        <div className="flex flex-col items-center gap-2" id="shareQr">
+          <img src={"data:image/svg+xml;charset=utf-8," + encodeURIComponent(qr.svg)} alt={t("分享連結的 QR 碼")} className="aspect-square w-full max-w-65 rounded bg-white [image-rendering:pixelated]" />
+          <div className="flex w-full flex-col gap-1.5">
+            <Note>{t("用手機掃描就能打開這個設計。")}</Note>
+            {local && <Note tone="warn">{t("目前的網址只在這台電腦有效，手機掃了打不開；放上網站後再分享。")}</Note>}
+            <button type="button" id="shareQrDownload" className={buttonClass} onClick={() => saveBlob(new Blob([qr.svg], { type: "image/svg+xml" }), "tqr-share-qr.svg")}>
+              {t("下載 QR 碼")}
+            </button>
+          </div>
+        </div>
+      ) : (
+        link && <Note>{t("連結太長，放不進 QR 碼。")}</Note>
+      )}
       {shown && <input ref={urlBox} type="text" id="shareUrl" readOnly value={shown} aria-label={t("分享連結")} className={`${inputClass} font-mono text-[11.5px]`} onFocus={(e) => e.target.select()} />}
       <p id="shareMsg" aria-live="polite" className="m-0 min-h-lh text-xs leading-snug text-muted">
         {msg}
