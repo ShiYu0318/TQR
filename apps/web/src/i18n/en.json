@@ -396,10 +396,16 @@
  "上傳 Logo 圖檔": "Upload a logo image",
  "圖片會縮成 32×32 格，再轉成黑白格子。": "The image is scaled to 32×32 and turned into black and white modules.",
  "點一下轉到那個方向。": "Click a view to turn to it.",
+ "關於 TQR Studio": "About TQR Studio",
+ "TQR 設計的是實體物件：從不同方向看，會讀到不同的 QR 碼。這個工作室在瀏覽器裡完成整個流程：輸入連結、生成模型、轉動檢查、下載列印檔。": "TQR designs physical objects that show a different QR code from each direction. This studio runs the whole workflow in the browser: enter the links, generate the model, turn it to check every view and download files for printing.",
+ "兩種模型": "Two models",
+ "一組方塊，從上、前、側三個方向看的剪影各是一個 QR 碼，也可以把其中一面換成牆或 Logo。要背光看剪影，對面看到的是鏡像；相機得拉遠，在數公尺外用長焦掃。": "A set of cubes whose silhouettes from the top, front and side are each a QR code; one view can be a wall or a logo instead. View it against a backlight; the opposite side shows the mirror image. Scan with a telephoto lens from several metres away.",
+ "一片平放的板子，每個 QR 模組是一個開口的格子。格子四面牆各帶一個方向的碼，格底帶俯視的碼，所以一片能放五個碼。從正上方讀俯視的碼；站到北、東、南、西任一邊，往下斜 35° 到 50° 讀那一邊的碼。": "A flat tile in which every QR module is an open cell. The four walls of each cell carry one direction's code and the floor carries the top code, so one tile holds five codes. Read the top code from straight above; stand on the north, east, south or west side and look down 35° to 50° for that side's code.",
+ "怎麼做到的": "How it works",
+ "三個剪影的共同部分通常會碎成很多互不相連的小塊，印不出來。生成器只在 QR 糾錯能力容許的範圍內補上格體，把碎塊接成一件；被定位圖案封住、補不過去的地方，再加上細支架。": "The volume shared by the three silhouettes usually falls apart into many loose pieces that cannot be printed. The generator adds cubes only where the QR error correction can absorb them, joining the pieces into one, and adds thin struts where finder patterns seal pieces off.",
+ "每個方向都會檢查：定位等功能圖案完全正確，而且每個區塊改動的碼字沒有超出糾錯上限，這個碼就有數學保證可以解碼。": "Every view is checked: when the function patterns are exact and no block has more changed codewords than it can correct, the code is certified decodable.",
+ "怎麼用": "How to use it",
+ "左邊填內容、選結構，按「生成」。拖曳旋轉模型，畫面停下來時，瀏覽器會讀一次目前的畫面，告訴你這個角度掃得到哪個連結。右邊可以儲存設計、下載列印檔，或產生分享連結。": "Fill in the content and pick a structure on the left, then press Generate. Drag to turn the model; when the view stops, the browser reads the frame and tells you which link scans from this angle. On the right you can save the design, download print files or make a share link.",
  "剪影要在約 {m} m 外拍攝。": "Shoot the silhouettes from about {m} m away.",
- "模組邊長是一格的實際大小，決定模型的總尺寸。模型越大，要站得越遠，透視才不會把剪影拉歪：拍攝距離和實際尺寸成正比。": "The module size is the real size of one cell and sets the overall size. The bigger the model, the further away you have to stand so that perspective does not distort the silhouettes: the shooting distance grows with the real size.",
- "多視角 QR 設計工作室": "Multi-view QR design studio",
- "拖曳旋轉模型。畫面停下來時，瀏覽器會讀一次目前的畫面，告訴你這個角度掃得到哪個連結。剪影雕塑可以輸入任何連結即時產生，並切換各種連接方式比較。": "Drag to rotate the model. When the view stops, the browser reads the current frame and tells you which link scans from this angle. Silhouette sculptures are generated live from any links, and you can compare connection methods.",
- "背光看剪影。上、前、側三個方向各一個碼（或 Logo），對面看到的是鏡像。需要把相機拉遠，數公尺外用長焦掃。": "View the silhouettes against a backlight. Top, front and side each carry a code (or a logo); the opposite side shows the mirror image. Pull the camera back and scan with a telephoto lens from several metres.",
- "平放在桌上。從正上方看，讀到的是俯視的碼；站到北、東、南、西任一邊，往下斜 35° 到 50° 讀到那一邊的碼。": "Lay it flat on a table. From straight above you read the top code; from the north, east, south or west side, looking down 35-50°, you read that side's code."
+ "模組邊長是一格的實際大小，決定模型的總尺寸。模型越大，要站得越遠，透視才不會把剪影拉歪：拍攝距離和實際尺寸成正比。": "The module size is the real size of one cell and sets the overall size. The bigger the model, the further away you have to stand so that perspective does not distort the silhouettes: the shooting distance grows with the real size."
 }
