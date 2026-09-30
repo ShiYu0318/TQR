@@ -19,7 +19,7 @@ flat tile version carries five codes, one from straight above and one from each 
   volume is easy, but it falls apart into many loose pieces. The solver adds material only where the QR error
   correction can absorb it, plus thin struts where nothing else is possible, so the object prints as one piece and
   each view still decodes. Every view comes with a check that its codewords stay within the correction capacity.
-- **Egg-crate tile.** Each QR module is an open cell. Its four walls and its floor are colored separately, so a viewer
+- **Egg-crate tile.** Each QR module is an open cell. Its four walls and its floor are coloured separately, so a viewer
   standing north sees one code, a viewer standing east sees another, and so on.
 
 TQR Studio is the browser app for designing these: type the links, turn the model in 3D, see which link decodes from
@@ -68,12 +68,12 @@ npm run build:demo   # everything in one file: apps/web/dist-single/index.html
 Silhouette sculptures need a backlight and a scan from a few metres away with a zoom lens; the tile works on a table
 at about 30 cm.
 
-## Data and licenses
+## Data and licences
 
 Everything in this repository, including the code, the STL models, the experiment data and the brand assets, is
 released under the Apache License 2.0 (see [LICENSE](LICENSE)). The models and data were produced by the code here; no
 third-party datasets are included, and the example links are placeholders. Third-party packages keep their own
-licenses, and the web app loads its fonts from Google Fonts under the SIL Open Font License.
+licences, and the web app loads its fonts from Google Fonts under the SIL Open Font License.
 
 ## Citation
 
