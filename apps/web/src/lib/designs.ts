@@ -4,7 +4,7 @@ import { useStudio } from "@/store";
 import { t } from "@/i18n";
 import { captureView } from "@/three/Scanner";
 import { contentTitle } from "./content";
-import { getState, setState } from "./share";
+import { getState, setState, type SavedState } from "./share";
 import { generate, showResult } from "./actions";
 import { indexedDbStore, memoryStore, type DesignRecord, type DesignStore } from "./designStore";
 
@@ -144,6 +144,45 @@ export async function loadDesign(id: string): Promise<boolean> {
     else void generate();
   }
   return true;
+}
+
+// ---- moving designs between browsers: one file for all of them (models are left out: they can be solved again)
+export const BUNDLE = "tqr-designs";
+
+export async function exportAll(): Promise<{ text: string; count: number }> {
+  const designs = (await listDesigns()).map(({ name, state, thumb, created, updated }) => ({ name, state, thumb, created, updated }));
+  return { text: JSON.stringify({ format: BUNDLE, v: 1, exported: new Date().toISOString(), designs }, null, 1), count: designs.length };
+}
+
+const looksLikeSettings = (s: unknown): s is SavedState => !!s && typeof s === "object" && (s as SavedState).v === 1 && Array.isArray((s as SavedState).content);
+
+/**
+ * Add the designs of a file: a bundle from exportAll, or a single settings file (a share-link payload saved as JSON).
+ * Designs already here with the same name and settings are skipped. Returns how many were added; throws on a file
+ * that is neither.
+ */
+export async function importText(text: string, fileName = ""): Promise<{ added: number; skipped: number }> {
+  const data = JSON.parse(text);
+  const incoming: { name: string; state: SavedState; thumb: string | null; created: number; updated: number }[] = [];
+  const now = Date.now();
+  if (data?.format === BUNDLE && Array.isArray(data.designs)) {
+    for (const d of data.designs)
+      if (looksLikeSettings(d?.state))
+        incoming.push({ name: String(d.name || t("未命名")), state: d.state, thumb: typeof d.thumb === "string" && d.thumb.startsWith("data:image/") ? d.thumb : null, created: +d.created || now, updated: +d.updated || now });
+  } else if (looksLikeSettings(data)) {
+    incoming.push({ name: fileName.replace(/\.json$/i, "") || t("匯入的設計"), state: data, thumb: null, created: now, updated: now });
+  } else throw new Error("not a TQR designs file");
+
+  const store = await designStore(), have = new Set((await store.all()).map((d) => d.name + "\n" + JSON.stringify(d.state)));
+  let added = 0;
+  for (const d of incoming) {
+    const key = d.name + "\n" + JSON.stringify(d.state);
+    if (have.has(key)) continue;
+    have.add(key);
+    await store.put({ id: newId(), result: null, ...d });
+    added++;
+  }
+  return { added, skipped: incoming.length - added };
 }
 
 /** start over from the default design, keeping the viewer's backdrop and language */

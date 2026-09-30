@@ -6,6 +6,8 @@ import {
   deleteDesign,
   designStore,
   duplicateDesign,
+  exportAll,
+  importText,
   listDesigns,
   loadDesign,
   newDesign,
@@ -14,6 +16,8 @@ import {
   updateDesign,
   type DesignRecord,
 } from "@/lib/designs";
+import { getState } from "@/lib/share";
+import { saveBlob } from "@/lib/export/formats";
 import { t, useT } from "@/i18n";
 
 const small = "cursor-pointer rounded border border-rule bg-transparent px-1.5 py-0.5 text-[11.5px] text-muted hover:border-muted hover:text-ink disabled:cursor-default disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-accent";
@@ -43,6 +47,7 @@ export function DesignsPanel() {
   const [renaming, setRenaming] = useState<{ id: string; name: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const file = useRef<HTMLInputElement>(null);
 
   const refresh = async () => {
     setItems(await listDesigns());
@@ -85,6 +90,34 @@ export function DesignsPanel() {
     }
     setConfirmDelete(null);
     void run(() => deleteDesign(d.id), t("已刪除「{n}」。", { n: d.name }));
+  };
+  const exportEverything = async () => {
+    const { text, count } = await exportAll();
+    saveBlob(new Blob([text], { type: "application/json" }), "tqr-designs.json");
+    setMsg(t("已匯出 {k} 個設計到 tqr-designs.json。", { k: count }));
+  };
+  const exportCurrent = () => {
+    saveBlob(new Blob([JSON.stringify(getState(), null, 2)], { type: "application/json" }), "tqr-settings.json");
+    setMsg(t("已匯出 tqr-settings.json。"));
+  };
+  const importFiles = async (files: FileList | null) => {
+    let added = 0, skipped = 0, bad = 0;
+    for (const f of Array.from(files ?? [])) {
+      try {
+        const r = await importText(await f.text(), f.name);
+        added += r.added;
+        skipped += r.skipped;
+      } catch {
+        bad++;
+      }
+    }
+    if (file.current) file.current.value = "";
+    setMsg(
+      bad && !added
+        ? t("這個檔案不是 TQR Studio 的設定檔。")
+        : t("已匯入 {a} 個設計", { a: added }) + (skipped ? t("，略過 {s} 個重複的", { s: skipped }) : "") + (bad ? t("，{b} 個檔案無法讀取", { b: bad }) : "") + t("。"),
+    );
+    await refresh();
   };
   const start = () => {
     newDesign();
@@ -168,6 +201,20 @@ export function DesignsPanel() {
       ) : (
         <p className="m-0 text-xs leading-snug text-muted">{t("還沒有儲存的設計。按「儲存目前設計」把現在的設計收進來。")}</p>
       )}
+      <div className="flex flex-col gap-2 border-t border-rule pt-2.5">
+        <div className="flex gap-2">
+          <button type="button" id="exportAll" className={buttonClass} disabled={!items.length} onClick={() => void exportEverything()}>
+            {t("匯出全部")}
+          </button>
+          <button type="button" id="importDesigns" className={buttonClass} onClick={() => file.current?.click()}>
+            {t("匯入")}
+          </button>
+        </div>
+        <button type="button" id="exportCurrent" className={buttonClass} onClick={exportCurrent}>
+          {t("只匯出目前設計")}
+        </button>
+        <input ref={file} type="file" id="importFile" accept="application/json,.json" multiple hidden onChange={(e) => void importFiles(e.target.files)} />
+      </div>
       <p id="designsMsg" aria-live="polite" className="m-0 min-h-lh text-xs leading-snug text-muted">
         {msg}
       </p>

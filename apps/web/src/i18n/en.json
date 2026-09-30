@@ -379,5 +379,14 @@
  "複製": "Duplicate",
  "再按一次刪除": "Click again to delete",
  "還沒有儲存的設計。按「儲存目前設計」把現在的設計收進來。": "No saved designs yet. Use \"Save this design\" to keep the one on screen.",
- "分享": "Share"
+ "分享": "Share",
+ "匯入的設計": "Imported design",
+ "已匯出 {k} 個設計到 tqr-designs.json。": "Exported {k} designs to tqr-designs.json.",
+ "已匯入 {a} 個設計": "Imported {a} designs",
+ "，略過 {s} 個重複的": ", skipped {s} duplicates",
+ "，{b} 個檔案無法讀取": ", {b} files could not be read",
+ "。": ".",
+ "匯出全部": "Export all",
+ "匯入": "Import",
+ "只匯出目前設計": "Export only this design"
 }

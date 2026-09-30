@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { Result } from "@tqr/tri-core";
 import { useStudio } from "@/store";
 import { memoryStore } from "./designStore";
-import { currentId, deleteDesign, duplicateDesign, listDesigns, loadDesign, newDesign, renameDesign, saveNew, updateDesign, useStore } from "./designs";
+import { currentId, deleteDesign, duplicateDesign, exportAll, importText, listDesigns, loadDesign, newDesign, renameDesign, saveNew, updateDesign, useStore } from "./designs";
 import { getState } from "./share";
 
 vi.mock("./actions", () => ({
@@ -91,6 +91,31 @@ describe("my designs", () => {
     const list = await listDesigns();
     expect(list.map((d) => d.name)).toContain("old one");
     expect(memory.has("tqr.saved")).toBe(false);
+  });
+  it("exports every design to one file and imports it into another browser", async () => {
+    const s = useStudio.getState();
+    s.setContent(0, url("https://s.gd/a"));
+    s.setResult(fakeResult, ["https://s.gd/a"], useStudio.getState().design);
+    await saveNew("first");
+    useStudio.getState().setContent(0, url("https://s.gd/b"));
+    await saveNew("second");
+    const { text, count } = await exportAll();
+    expect(count).toBe(2);
+    expect(text).not.toContain('"result"'); // models stay out of the file
+
+    useStore(memoryStore()); // another browser
+    expect(await importText(text)).toEqual({ added: 2, skipped: 0 });
+    expect(await importText(text)).toEqual({ added: 0, skipped: 2 }); // same file twice adds nothing
+    const list = await listDesigns();
+    expect(list.map((d) => d.name).sort()).toEqual(["first", "second"]);
+    expect(list.find((d) => d.name === "second")!.state.content[0].f.url).toBe("https://s.gd/b");
+  });
+  it("imports a single settings file under the file's name and rejects anything else", async () => {
+    useStudio.getState().setContent(0, url("https://s.gd/single"));
+    expect(await importText(JSON.stringify(getState()), "poster.json")).toEqual({ added: 1, skipped: 0 });
+    expect((await listDesigns())[0].name).toBe("poster");
+    await expect(importText('{"hello": 1}')).rejects.toThrow();
+    await expect(importText("not json")).rejects.toThrow();
   });
   it("starts a new design from the defaults and forgets the open record", async () => {
     await saveNew("keep");
