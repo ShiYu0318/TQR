@@ -75,7 +75,7 @@ export interface Camera {
 interface State {
   lang: Lang;
   model: Model;
-  /** which settings panels are open, by panel id */
+  /** which settings panels are open, by panel id; every panel starts closed on each visit */
   panels: Record<string, boolean>;
   /** controls hidden from the 3D view */
   clean: boolean;
@@ -120,7 +120,7 @@ export const useStudio = create<State>()(
     (set) => ({
       lang: defaultLang(),
       model: "sil",
-      panels: { content: true, structure: true, look: true, logo: false, output: true, share: true },
+      panels: {},
       clean: false,
       design: {
         mode: "3qr",
@@ -176,9 +176,10 @@ export const useStudio = create<State>()(
       name: "tqr.studio",
       onRehydrateStorage: () => (s) => setLanguage(s?.lang ?? defaultLang()),
       // per-viewer conveniences only; the design itself travels in share links and saved files
-      partialize: (s) => ({ lang: s.lang, panels: s.panels, look: { backdrop: s.look.backdrop, floor: s.look.floor } }),
+      partialize: (s) => ({ lang: s.lang, look: { backdrop: s.look.backdrop, floor: s.look.floor } }),
       merge: (saved, current) => {
-        const p = (saved ?? {}) as Partial<State>;
+        // open panels saved by earlier versions are ignored: the page always opens with every panel closed
+        const { panels: _ignored, ...p } = (saved ?? {}) as Partial<State>;
         return { ...current, ...p, look: { ...current.look, ...(p.look ?? {}) } };
       },
     },

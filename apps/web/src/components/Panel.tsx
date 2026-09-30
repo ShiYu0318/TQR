@@ -14,10 +14,10 @@ interface Props {
 
 /**
  * A foldable settings panel. Closed, the chevron points into the page (right / left); open, it points down.
- * Open or closed is remembered per viewer (the store persists it).
+ * Every panel starts closed when the page opens.
  */
 export function Panel({ id, title, side, children, hidden }: Props) {
-  const open = useStudio((s) => s.panels[id] ?? true);
+  const open = useStudio((s) => s.panels[id] ?? false);
   const setPanel = useStudio((s) => s.setPanel);
   useT();
   if (hidden) return null;
