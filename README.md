@@ -9,6 +9,10 @@
 
 # TQR
 
+An innovative 3D QR code generator employing view-dependent illusions to encode multiple codes across angles. Built on
+this framework via graph algorithm, topology, and combinatorial optimization, synthesized geometries can be 3D-printed
+into physical objects.
+
 TQR is about physical objects that show a different QR code depending on where you look at them from. A small
 3D-printed piece held up to a light gives one link from the top, another from the front and a third from the side. A
 flat tile version carries five codes, one from straight above and one from each side, and works at phone distance.

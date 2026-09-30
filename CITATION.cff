@@ -1,7 +1,7 @@
 cff-version: 1.2.0
 message: "If you use this software, please cite it as below."
 title: "TQR Studio"
-abstract: "A browser app for designing physical objects that show a different QR code from each viewing direction."
+abstract: "An innovative 3D QR code generator employing view-dependent illusions to encode multiple codes across angles. Built on this framework via graph algorithm, topology, and combinatorial optimization, synthesized geometries can be 3D-printed into physical objects."
 type: software
 authors:
   - family-names: "Huang"
