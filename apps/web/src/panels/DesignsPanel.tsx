@@ -127,26 +127,21 @@ export function DesignsPanel() {
 
   return (
     <Panel id="designs" title="我的設計" side="right">
+      {/* a long design name gets its own row, so the other buttons never get pushed out */}
+      {open && (
+        <button type="button" id="updateDesign" className={`${buttonClass} min-w-0`} onClick={() => void update()} title={t("用目前的設計覆蓋「{n}」", { n: open.name })}>
+          <span className="truncate">{t("更新「{n}」", { n: open.name })}</span>
+        </button>
+      )}
       <div className="flex gap-2">
-        {open ? (
-          <>
-            <button type="button" id="updateDesign" className={buttonClass} onClick={() => void update()} title={t("用目前的設計覆蓋「{n}」", { n: open.name })}>
-              <span className="truncate">{t("更新「{n}」", { n: open.name })}</span>
-            </button>
-            <button type="button" id="saveDesign" className={`${buttonClass} flex-none`} onClick={() => void save()}>
-              {t("另存新的")}
-            </button>
-          </>
-        ) : (
-          <button type="button" id="saveDesign" className={buttonClass} onClick={() => void save()}>
-            <PanelIcon>
-              <path d="M3 2.5h8l2.5 2.5v8.5h-10.5z" />
-              <path d="M5.5 2.5v3h5v-3" />
-              <rect x="5" y="9" width="6" height="4.5" />
-            </PanelIcon>
-            <span>{t("儲存目前設計")}</span>
-          </button>
-        )}
+        <button type="button" id="saveDesign" className={buttonClass} onClick={() => void save()}>
+          <PanelIcon>
+            <path d="M3 2.5h8l2.5 2.5v8.5h-10.5z" />
+            <path d="M5.5 2.5v3h5v-3" />
+            <rect x="5" y="9" width="6" height="4.5" />
+          </PanelIcon>
+          <span>{open ? t("另存新的") : t("儲存目前設計")}</span>
+        </button>
         <button type="button" id="newDesign" className={`${buttonClass} flex-none`} onClick={start} disabled={busy}>
           {t("新設計")}
         </button>
