@@ -2,6 +2,7 @@ import * as Collapsible from "@radix-ui/react-collapsible";
 import type { ReactNode } from "react";
 import { useStudio } from "@/store";
 import { t, useT } from "@/i18n";
+import { Info } from "./Info";
 
 interface Props {
   id: string;
@@ -54,15 +55,33 @@ export function Note({ children, tone }: { children: ReactNode; tone?: "warn" | 
   return <p className={`m-0 text-xs leading-snug ${color}`}>{children}</p>;
 }
 
-/** label + control on one row (5.2em label column); the label is translated here */
-export function Field({ label, htmlFor, children, inline = true }: { label: string; htmlFor?: string; children: ReactNode; inline?: boolean }) {
+/**
+ * label + control on one row; the label is translated here; `info` adds an explanation button. The label column fits
+ * four Chinese characters and the button, or an English label ("Content type") and the button.
+ */
+export function Field({ label, htmlFor, children, inline = true, info }: { label: string; htmlFor?: string; children: ReactNode; inline?: boolean; info?: ReactNode }) {
+  const en = useStudio((s) => s.lang === "en");
+  const row = en ? "grid-cols-[7em_minmax(0,1fr)]" : "grid-cols-[5.2em_minmax(0,1fr)]";
   return (
-    <div className={inline ? "grid grid-cols-[5.2em_minmax(0,1fr)] items-center gap-2" : "flex flex-col gap-1"}>
-      <label htmlFor={htmlFor} className="text-[12.5px] text-muted">
-        {t(label)}
-      </label>
+    <div className={inline ? `grid ${row} items-center gap-2` : "flex flex-col gap-1"}>
+      <Labelled info={info} topic={label}>
+        <label htmlFor={htmlFor} className="text-[12.5px] text-muted">
+          {t(label)}
+        </label>
+      </Labelled>
       {children}
     </div>
+  );
+}
+
+/** a label followed by its (i) button when there is something to explain; the button stays outside the <label> */
+export function Labelled({ children, info, topic, wide }: { children: ReactNode; info?: ReactNode; topic?: string; wide?: boolean }) {
+  if (!info) return <>{children}</>;
+  return (
+    <span className="flex min-w-0 items-center gap-1">
+      {children}
+      <Info topic={topic} wide={wide}>{info}</Info>
+    </span>
   );
 }
 
