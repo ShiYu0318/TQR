@@ -14,7 +14,7 @@ Object.assign(window, { __studio: useStudio, __scan: scanNow, __capture: () => s
 
 // the last draft comes back first, then a shared link overrides it; both before the first generation
 restoreDraft();
-sharedNote.text = applySharedHash();
+sharedNote.text = await applySharedHash();
 keepDraft();
 
 createRoot(document.getElementById("root")!).render(

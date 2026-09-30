@@ -388,5 +388,6 @@
  "。": ".",
  "匯出全部": "Export all",
  "匯入": "Import",
- "只匯出目前設計": "Export only this design"
+ "只匯出目前設計": "Export only this design",
+ "連結帶上目前的視角": "Include the current view in the link"
 }

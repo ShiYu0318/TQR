@@ -5,6 +5,7 @@ import { StageView } from "@/stage/StageView";
 import { BottomStats } from "@/components/BottomStats";
 import { farDistanceCm } from "@/three/geometry";
 import { generate } from "@/lib/actions";
+import { takePendingView } from "@/lib/share";
 import { useStudio } from "@/store";
 
 // Layout: header on top, settings left and right of the 3D stage,
@@ -16,7 +17,9 @@ export function App() {
   useEffect(() => {
     const s = useStudio.getState();
     s.setCamera({ spin: null });
-    if (model === "tile") s.requestView(0, 40, 30);
+    const shared = model === "tile" ? takePendingView() : null;
+    if (shared) s.requestView(shared.az, shared.el, shared.cm);
+    else if (model === "tile") s.requestView(0, 40, 30);
     else if (s.result) s.requestView(0, 0, farDistanceCm(s.result.n, s.moduleMm.sil));
   }, [model]);
   return (

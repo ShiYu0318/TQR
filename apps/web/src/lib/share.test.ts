@@ -1,7 +1,7 @@
 // Share tokens must round-trip, and unknown or broken settings must not get in.
 import { describe, expect, it } from "vitest";
 import { useStudio } from "@/store";
-import { decodeState, encodeState, getState, setState } from "./share";
+import { decodeShare, decodeState, encodeShare, encodeState, getState, setState, takePendingView } from "./share";
 
 describe("share tokens", () => {
   it("round-trip the whole design, look and module sizes", () => {
@@ -33,5 +33,30 @@ describe("share tokens", () => {
     expect(after.bg).toBe(before.bg);
     expect(after.mod).toEqual(before.mod);
     expect(after.colors.model).toBe(before.colors.model);
+  });
+});
+
+describe("short links (s2)", () => {
+  it("round-trip, are shorter than s1, and s1 links still open", async () => {
+    useStudio.setState(useStudio.getInitialState());
+    const logo = { ...useStudio.getState().design.centerLogo, kind: "image" as const, image: { size: 32, bits: Array.from({ length: 1024 }, (_, i) => (i % 7 < 3 ? 1 : 0)) } };
+    useStudio.getState().setDesign({ centerLogo: logo });
+    const s = getState(), short = await encodeShare(s), long = encodeState(s);
+    expect(short).toMatch(/^s2\.[A-Za-z0-9_-]+$/);
+    expect(short.length).toBeLessThan(long.length / 2);
+    expect(await decodeShare(short)).toEqual(s);
+    expect(await decodeShare(long)).toEqual(s);
+    await expect(decodeShare("s9.xyz")).rejects.toThrow();
+  });
+  it("carry the camera view when asked, used once and kept in range", () => {
+    useStudio.getState().setCamera({ distanceCm: 420 });
+    const s = getState(true);
+    expect(s.view).toEqual({ az: 0, el: 0, cm: 420 });
+    expect(getState().view).toBeUndefined();
+    setState({ ...s, view: { az: -30, el: 120, cm: 5 } });
+    expect(takePendingView()).toEqual({ az: 330, el: 90, cm: 10 });
+    expect(takePendingView()).toBeNull();
+    setState(getState()); // settings without a view leave none pending
+    expect(takePendingView()).toBeNull();
   });
 });

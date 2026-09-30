@@ -1,11 +1,19 @@
 // Share links, saved settings and settings files, all in one versioned format (v1). The hash is a bare token
 // (#s1.<base64url JSON>) so it survives hosts that only keep plain #anchors.
+import { live } from "@/three/live";
 import { useStudio, type Content, type Design, type Look, type Model, type Shape } from "@/store";
 import type { Level, Mode } from "@tqr/tri-core";
 import { CONTENT_TYPES, type Values } from "./content";
 import { LOGO_FONTS, type CenterLogo } from "./centerLogo";
 import type { LogoKind } from "./sideLogo";
 import { BACKDROPS, GRADIENTS, PIECE_PALETTES, THEMES, type Colors } from "@/three/palette";
+
+/** camera position of a shared view: azimuth and elevation in degrees, distance in cm */
+export interface SharedView {
+  az: number;
+  el: number;
+  cm: number;
+}
 
 export interface SavedState {
   v: 1;
@@ -30,10 +38,14 @@ export interface SavedState {
     model: string; finder: string; dark: string; light: string; base: string; bridge: string; strut: string; main: string;
     pal: string; fill: Colors["fill"]; grad: string; gradA: string; gradB: string; gradDir: Colors["gradDir"];
   };
+  /** where the camera looks from, when the link was shared with its view */
+  view?: SharedView;
 }
 
-export function getState(): SavedState {
-  const { model, design: d, look: l, moduleMm } = useStudio.getState(), c = l.colors, { image, ...clogo } = d.centerLogo;
+/** the settings on screen; with `withView`, also where the camera looks from */
+export function getState(withView = false): SavedState {
+  const { model, design: d, look: l, moduleMm, camera } = useStudio.getState(), c = l.colors, { image, ...clogo } = d.centerLogo;
+  const view = withView ? { view: { az: +live.azimuth.toFixed(1), el: +live.elevation.toFixed(1), cm: Math.round(camera.distanceCm) } } : {};
   return {
     v: 1, model, mode: d.mode, content: d.content.map((x) => ({ t: x.type, f: x.fields })), ec: d.level, ver: String(d.version),
     logo: { k: d.sideLogo.kind, txt: d.sideLogo.text, badge: d.sideLogo.badge, lb: d.sideLogo.budget },
@@ -44,6 +56,7 @@ export function getState(): SavedState {
       model: c.model, finder: c.finder, dark: c.dark, light: c.light, base: c.base, bridge: c.bridge, strut: c.strut, main: c.main,
       pal: c.palette, fill: c.fill, grad: c.gradient, gradA: c.gradA, gradB: c.gradB, gradDir: c.gradDir,
     },
+    ...view,
   };
 }
 
@@ -113,6 +126,18 @@ export function setState(s: Partial<SavedState> | null | undefined) {
     if (v >= 1 && v <= 20) st.setModuleMm(k, v);
   });
   if ((s.model === "sil" || s.model === "tile") && s.model !== st.model) st.setModel(s.model);
+  const v = s.view;
+  pendingView = v && [v.az, v.el, v.cm].every(Number.isFinite)
+    ? { az: ((v.az % 360) + 360) % 360, el: Math.max(-90, Math.min(90, v.el)), cm: Math.max(10, Math.min(2000, v.cm)) }
+    : null;
+}
+
+// a view that arrived with the settings, used once when the model is framed
+let pendingView: SharedView | null = null;
+export function takePendingView(): SharedView | null {
+  const v = pendingView;
+  pendingView = null;
+  return v;
 }
 
 const b64url = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes)).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -120,21 +145,32 @@ const unb64url = (s: string) => Uint8Array.from(atob(s.replace(/-/g, "+").replac
 export const encodeState = (s: SavedState) => "s1." + b64url(new TextEncoder().encode(JSON.stringify(s)));
 export const decodeState = (tok: string): SavedState => JSON.parse(new TextDecoder().decode(unb64url(tok.slice(3))));
 
-/** this page's address with the current settings in the hash */
-export function shareUrl() {
-  const tok = encodeState(getState());
-  try {
-    history.replaceState(null, "", "#" + tok);
-  } catch {
-    /* some hosts refuse; the link still works */
-  }
-  return location.href.split("#")[0] + "#" + tok;
+// s2 links: the same JSON, deflated first, so a link is about half as long. s1 links still open.
+async function squeeze(bytes: Uint8Array, way: "in" | "out"): Promise<Uint8Array> {
+  const stream = way === "in" ? new CompressionStream("deflate") : new DecompressionStream("deflate");
+  return new Uint8Array(await new Response(new Blob([bytes as BlobPart]).stream().pipeThrough(stream)).arrayBuffer());
+}
+
+export async function encodeShare(s: SavedState): Promise<string> {
+  if (typeof CompressionStream === "undefined") return encodeState(s);
+  return "s2." + b64url(await squeeze(new TextEncoder().encode(JSON.stringify(s)), "in"));
+}
+
+export async function decodeShare(token: string): Promise<SavedState> {
+  if (token.startsWith("s1.")) return decodeState(token);
+  if (token.startsWith("s2.")) return JSON.parse(new TextDecoder().decode(await squeeze(unb64url(token.slice(3)), "out")));
+  throw new Error("not a share token");
+}
+
+/** a link to this page that opens the settings on screen (and the camera view, with `withView`) */
+export async function shareLink(withView = false): Promise<string> {
+  return location.href.split("#")[0] + "#" + (await encodeShare(getState(withView)));
 }
 
 /** open a shared link: restore its settings before the first generation; returns what to tell the viewer */
-export function applySharedHash(): string {
+export async function applySharedHash(): Promise<string> {
   const h = location.hash.slice(1);
-  if (!h.startsWith("s1.")) return "";
+  if (!h.startsWith("s1.") && !h.startsWith("s2.")) return "";
   // applied once: later edits are the viewer's own draft, so a reload must not bring the link back
   try {
     history.replaceState(null, "", location.pathname + location.search);
@@ -142,7 +178,7 @@ export function applySharedHash(): string {
     /* some hosts refuse; harmless */
   }
   try {
-    setState(decodeState(h));
+    setState(await decodeShare(h));
     return "已套用分享連結的設定。";
   } catch {
     return "分享連結無法讀取，改用預設值。";

@@ -3,6 +3,7 @@ import { useStudio } from "@/store";
 import { farDistanceCm } from "@/three/geometry";
 import { prepare, solverError } from "./solve";
 import { solverWorker } from "./solverClient";
+import { takePendingView } from "./share";
 
 /** Run the solver (in a worker) on the current design, show the result and frame it. */
 export async function generate() {
@@ -25,5 +26,8 @@ export function showResult(result: Result, links: string[], design = useStudio.g
   const { model, moduleMm, requestView, resetFound, setResult } = useStudio.getState();
   setResult(result, links, design);
   resetFound("sil");
-  if (model === "sil") requestView(0, 0, farDistanceCm(result.n, moduleMm.sil));
+  if (model !== "sil") return;
+  const v = takePendingView(); // a shared link can carry its own view
+  if (v) requestView(v.az, v.el, v.cm);
+  else requestView(0, 0, farDistanceCm(result.n, moduleMm.sil));
 }
