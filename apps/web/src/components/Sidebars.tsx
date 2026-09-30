@@ -52,8 +52,8 @@ export function RightSidebar() {
   const t = useT();
   return (
     <aside className="area-right flex min-h-0 flex-col gap-3 overflow-y-auto scrollbar-thin" aria-label={t("輸出與分享")}>
-      <OutputPanel />
       <DesignsPanel />
+      <OutputPanel />
       <SharePanel />
     </aside>
   );

@@ -48,7 +48,7 @@ export function OutputPanel() {
   };
 
   return (
-    <Panel id="output" title="輸出" side="right">
+    <Panel id="output" title="下載" side="right">
       <div className="flex flex-col gap-1.5 border-b border-rule pb-2.5">
         <Field label="模組邊長" htmlFor="modMM">
           <div className="flex items-center gap-1.5">
@@ -71,6 +71,9 @@ export function OutputPanel() {
         </Field>
         <Note>{sizeNote()}</Note>
       </div>
+      <Field label="檔名" htmlFor="outName" inline={false}>
+        <input type="text" id="outName" spellCheck={false} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
+      </Field>
       <Field label="檔案格式" htmlFor="outFmt" inline={false}>
         <select id="outFmt" className={inputClass} value={format} onChange={(e) => setFormat(e.target.value as Format)}>
           {FORMATS.map(([v, l]) => (
@@ -99,9 +102,6 @@ export function OutputPanel() {
           <Note>{t("QR 剪影就是可解碼證明檢查的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。")}</Note>
         </div>
       )}
-      <Field label="檔名" htmlFor="outName" inline={false}>
-        <input type="text" id="outName" spellCheck={false} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
-      </Field>
       <button
         type="button"
         id="dlBtn"

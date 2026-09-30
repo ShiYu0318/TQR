@@ -144,7 +144,6 @@
  "預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。": "Preview of the QR as seen from the top; the logo is blue. Codewords the logo changes are taken out of the error correction first and bridges only use what is left, so decoding stays certified.",
  "Logo 太大：{view}的第 {b} 區塊要改動 {x} 個碼字，但只能更正 {c} 個。請縮小 Logo、改用「字外框」或「透明底」，或加大 QR 版本。": "Logo too large: block {b} of the {view} view would change {x} codewords but can only correct {c}. Make the logo smaller, use Outline or Transparent, or pick a larger QR version.",
  "Logo 用掉 {u}": "Logo uses {u}",
- "輸出": "Output",
  "模組邊長": "Module size",
  "總尺寸 {w} × {h} × {d} cm。": "Overall size {w} × {h} × {d} cm.",
  "剪影要在約 {m} m 外拍攝（視差限制和實際尺寸成正比）。": "Shoot the silhouettes from about {m} m away (the parallax limit scales with the real size).",
@@ -389,5 +388,6 @@
  "已交給系統的分享選單。": "Handed to the system share sheet.",
  "無法開啟系統的分享選單，可以改用複製連結。": "The system share sheet could not open; copy the link instead.",
  "下載分享圖卡": "Download share card",
- "分享…": "Share…"
+ "分享…": "Share…",
+ "儲存": "Save"
 }

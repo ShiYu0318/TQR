@@ -126,7 +126,7 @@ export function DesignsPanel() {
   };
 
   return (
-    <Panel id="designs" title="我的設計" side="right">
+    <Panel id="designs" title="儲存" side="right">
       {/* a long design name gets its own row, so the other buttons never get pushed out */}
       {open && (
         <button type="button" id="updateDesign" className={`${buttonClass} min-w-0`} onClick={() => void update()} title={t("用目前的設計覆蓋「{n}」", { n: open.name })}>
