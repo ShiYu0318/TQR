@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useStudio, type Look, type Shape } from "@/store";
-import { Field, Note, Panel, inputClass } from "@/components/Panel";
+import { Field, Labelled, Note, Panel, inputClass } from "@/components/Panel";
+import { Info, Term } from "@/components/Info";
 import { Segmented } from "@/components/Segmented";
 import { BACKDROPS, BACKDROP_NAMES, GRADIENTS, PALETTE_BASE, PIECE_PALETTES, THEMES, type Colors } from "@/three/palette";
 import { filamentContrast } from "@/lib/colour";
@@ -70,7 +71,23 @@ export function LookPanel() {
       </Field>
       {sil && (
         <div className="flex flex-col gap-1">
-          <span className="text-[12.5px] text-muted">{t("顯示方式")}</span>
+          <Labelled
+            topic="顯示方式"
+            info={(
+              [
+                ["sil", "背光剪影"],
+                ["real", "實物"],
+                ["solid", "結構"],
+                ["pieces", "碎塊"],
+              ] as [Look, string][]
+            ).map(([k, name]) => (
+              <Term key={k} name={t(name)}>
+                {t(LOOK_NOTES[k])}
+              </Term>
+            ))}
+          >
+            <span className="text-[12.5px] text-muted">{t("顯示方式")}</span>
+          </Labelled>
           <Segmented
             label={t("顯示方式")}
             value={look.look}
@@ -83,10 +100,9 @@ export function LookPanel() {
             ]}
             className="[&>button]:py-1 [&>button]:text-[13px]"
           />
-          <Note>{t(LOOK_NOTES[look.look])}</Note>
         </div>
       )}
-      <Field label="背景" htmlFor="bgSel">
+      <Field label="背景" htmlFor="bgSel" info={<p>{t("背光剪影固定用白色背光，掃描才讀得到；其他顯示方式和蛋格會用這個背景。")}</p>}>
         <select id="bgSel" className={inputClass} value={look.backdrop} onChange={(e) => setLook({ backdrop: e.target.value })}>
           {Object.keys(BACKDROPS).map((k) => (
             <option key={k} value={k}>{t(BACKDROP_NAMES[k])}</option>
@@ -97,10 +113,18 @@ export function LookPanel() {
         <input type="checkbox" className="mt-0.5 accent-accent" checked={look.floor} onChange={(e) => setLook({ floor: e.target.checked })} />
         {t("底盤陰影")}
       </label>
-      {sil && look.look === "sil" && <Note>{t("背光剪影固定用白色背光，掃描才讀得到；其他顯示方式和蛋格會用這個背景。")}</Note>}
       {sil && (
         <>
-          <Field label="格體形狀" htmlFor="shape">
+          <Field
+            label="格體形狀"
+            htmlFor="shape"
+            info={
+              <>
+                <Term name={t("圓角方塊")}>{t("圓角方塊的面中央仍然互相接觸，可以印成一件。")}</Term>
+                <Term name={t("圓柱和球")}>{t("圓柱和球之間只有線或點接觸，只適合封在透明材料裡；剪影會變成圓點，定位圖案可能讀不到。")}</Term>
+              </>
+            }
+          >
             <select id="shape" className={inputClass} value={shape} onChange={(e) => setLook({ shape: e.target.value as Shape })}>
               <option value="cube">{t("方塊")}</option>
               <option value="rounded">{t("圓角方塊")}</option>
@@ -108,14 +132,12 @@ export function LookPanel() {
               <option value="sphere" disabled={!unconnected}>{t("球（只限不必相連）")}</option>
             </select>
           </Field>
-          {shape === "rounded" && <Note>{t("圓角方塊的面中央仍然互相接觸，可以印成一件。")}</Note>}
-          {(shape === "cylinder" || shape === "sphere") && <Note>{t("圓柱和球之間只有線或點接觸，只適合封在透明材料裡；剪影會變成圓點，定位圖案可能讀不到。")}</Note>}
         </>
       )}
       {sil && look.look === "real" && (
         <Colours>
           <div className="basis-full">
-            <Field label="上色" htmlFor="fillMode">
+            <Field label="上色" htmlFor="fillMode" info={<p>{t("漸層只影響畫面；匯出的檔案仍是單色（用模型顏色）。")}</p>}>
               <select id="fillMode" className={inputClass} value={c.fill} onChange={(e) => setColors({ fill: e.target.value as Colors["fill"] })}>
                 <option value="solid">{t("單色")}</option>
                 <option value="gradient">{t("漸層")}</option>
@@ -147,15 +169,16 @@ export function LookPanel() {
                 </select>
               </Field>
               <div aria-hidden="true" className="h-3 rounded border border-rule" style={{ background: `linear-gradient(to right, ${gradStops.join(", ")})` }} />
-              <Note>{t("漸層只影響畫面；匯出的檔案仍是單色（用模型顏色）。")}</Note>
             </div>
           ) : (
             <>
               <Swatch label="模型顏色" value={c.model} onChange={(v) => setColors({ model: v }, true)} />
-              <Swatch label="定位圖案顏色" value={c.finder} onChange={(v) => setColors({ finder: v }, true)} />
-              <div className="basis-full">
-                <Note>{t("定位圖案顏色和模型不同時，就是雙材質列印；形狀不變，所以仍然保證可解碼。")}</Note>
-              </div>
+              <span className="inline-flex items-center gap-1">
+                <Swatch label="定位圖案顏色" value={c.finder} onChange={(v) => setColors({ finder: v }, true)} />
+                <Info topic="定位圖案顏色">
+                  <p>{t("定位圖案顏色和模型不同時，就是雙材質列印；形狀不變，所以仍然保證可解碼。")}</p>
+                </Info>
+              </span>
             </>
           )}
         </Colours>

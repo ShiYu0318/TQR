@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useStudio } from "@/store";
-import { Field, Note, Panel, inputClass } from "@/components/Panel";
+import { Field, Labelled, Note, Panel, inputClass } from "@/components/Panel";
+import { Term } from "@/components/Info";
 import { FORMATS, download, sizeNote, type Format } from "@/lib/export";
 import { t, useT } from "@/i18n";
 
@@ -50,7 +51,7 @@ export function OutputPanel() {
   return (
     <Panel id="output" title="下載" side="right">
       <div className="flex flex-col gap-1.5 border-b border-rule pb-2.5">
-        <Field label="模組邊長" htmlFor="modMM">
+        <Field label="模組邊長" htmlFor="modMM" info={<p>{t("模組邊長是一格的實際大小，決定模型的總尺寸。模型越大，要站得越遠，透視才不會把剪影拉歪：拍攝距離和實際尺寸成正比。")}</p>}>
           <div className="flex items-center gap-1.5">
             <input
               type="number"
@@ -74,7 +75,19 @@ export function OutputPanel() {
       <Field label="檔名" htmlFor="outName" inline={false}>
         <input type="text" id="outName" spellCheck={false} value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
       </Field>
-      <Field label="檔案格式" htmlFor="outFmt" inline={false}>
+      <Field
+        label="檔案格式"
+        htmlFor="outFmt"
+        inline={false}
+        info={
+          <>
+            <Term name="STL / OBJ">{t("整個模型合成一個實體，適合單色列印。")}</Term>
+            <Term name="3MF">{t("3MF 含兩個零件，可直接用雙色印表機。")}</Term>
+            <Term name={t("PNG（目前畫面）")}>{t("把畫面上看到的樣子存成圖片。")}</Term>
+            <Term name={t("QR 剪影（PNG、SVG）")}>{t("檢查可解碼保證時用的模組圖案，方向和畫面上看到的一樣。")}</Term>
+          </>
+        }
+      >
         <select id="outFmt" className={inputClass} value={format} onChange={(e) => setFormat(e.target.value as Format)}>
           {FORMATS.map(([v, l]) => (
             <option key={v} value={v} disabled={model !== "sil" && (v === "png-qr" || v === "svg-qr")}>
@@ -95,11 +108,12 @@ export function OutputPanel() {
             </select>
           </Field>
           <div className="flex items-baseline justify-between gap-2.5">
-            <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("邊框（模組）")}</span>
+            <Labelled topic="邊框（模組）" info={<p>{t("邊框是四周留白的模組數，QR 規格建議 4。")}</p>}>
+              <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("邊框（模組）")}</span>
+            </Labelled>
             <span className="font-mono text-[13px] tabular-nums">{border}</span>
           </div>
           <input type="range" id="outBorder" aria-label={t("邊框（模組）")} min={0} max={8} value={border} onChange={(e) => setBorder(+e.target.value)} className="w-full accent-accent" />
-          <Note>{t("QR 剪影就是檢查可解碼保證時用的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。")}</Note>
         </div>
       )}
       <button
@@ -114,7 +128,6 @@ export function OutputPanel() {
       <p id="dlMsg" aria-live="polite" className={`m-0 min-h-lh text-xs leading-snug ${msg.bad ? "text-bad" : "text-muted"}`}>
         {msg.text}
       </p>
-      <Note>{t("3MF 含兩個零件，可直接用雙色印表機。")}</Note>
     </Panel>
   );
 }

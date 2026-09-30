@@ -2,6 +2,7 @@ import type { Certificate, ImageCheck } from "@tqr/tri-core";
 import type { ReactNode } from "react";
 import { useStudio } from "@/store";
 import { t, useT } from "@/i18n";
+import { Labelled } from "./Panel";
 
 const pct = (x: number) => (100 * x).toFixed(0) + "%";
 
@@ -62,7 +63,9 @@ export function BottomStats() {
         ))}
       </div>
       <div className="flex min-h-0 flex-col gap-1.5 overflow-y-auto rounded-lg border border-rule bg-panel px-3 py-2.5" id="verdictCard">
-        <div className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("檢查結果")}</div>
+        <Labelled topic="檢查結果" info={note ? <p>{note}</p> : undefined}>
+          <div className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("檢查結果")}</div>
+        </Labelled>
         <div className="flex flex-col gap-1 text-[13px]">
           <Row name={t("一體成形")}>
             {onePiece ? <Pill tone="ok">{t("可以印成一件")}</Pill> : spec.method === "free" ? <Pill tone="warn">{t("不相連，需要透明材料包覆")}</Pill> : <Pill tone="warn">{t("{k} 塊分開", { k: r.pieces })}</Pill>}
@@ -92,7 +95,6 @@ export function BottomStats() {
             <span className="text-xs text-muted">{r.ms} ms</span>
           </Row>
         </div>
-        {note && <p className="m-0 text-xs leading-snug text-muted">{note}</p>}
       </div>
     </section>
   );

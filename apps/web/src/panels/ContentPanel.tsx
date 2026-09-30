@@ -3,7 +3,8 @@ import type { Level, Mode } from "@tqr/tri-core";
 import { useStudio } from "@/store";
 import { CONTENT_TYPES, encodeContent, payloadPreview, type FieldDef } from "@/lib/content";
 import { sideLogoImage, type LogoKind } from "@/lib/sideLogo";
-import { Field, Note, Panel, inputClass } from "@/components/Panel";
+import { Field, Labelled, Panel, inputClass } from "@/components/Panel";
+import { Info } from "@/components/Info";
 import { t, useT } from "@/i18n";
 
 const VIEW_NAMES = ["上方", "前方", "側面"];
@@ -81,7 +82,9 @@ export function ContentPanel() {
         </select>
       </Field>
       <div className="flex flex-col gap-1">
-        <span className="text-[12.5px] text-muted">{t("各方向的內容（點一下切換編輯）")}</span>
+        <Labelled topic="各方向的內容" info={<p>{t("點一下切換要編輯的方向。")}</p>}>
+          <span className="text-[12.5px] text-muted">{t("各方向的內容")}</span>
+        </Labelled>
         <div className="flex flex-col gap-0.75" role="group" aria-label={t("各方向的內容")} id="viewList">
           {Array.from({ length: views }, (_, i) => {
             const content = design.content[i];
@@ -101,7 +104,16 @@ export function ContentPanel() {
           })}
         </div>
       </div>
-      <Field label="內容類型" htmlFor="ctype">
+      <Field
+        label="內容類型"
+        htmlFor="ctype"
+        info={
+          <>
+            <p>{t("選擇這個方向要放什麼。手機掃到後會照類型處理，例如網址會打開網頁，Wi‑Fi 會提示連線。")}</p>
+            {def.note && <p>{t(def.note)}</p>}
+          </>
+        }
+      >
         <select
           id="ctype"
           className={inputClass}
@@ -118,15 +130,18 @@ export function ContentPanel() {
           <ContentField key={c.type + fd.key} def={fd} value={c.fields[fd.key]} onChange={(v) => setContent(current, { type: c.type, fields: { ...c.fields, [fd.key]: v } })} />
         ))}
       </div>
-      {def.note && <Note>{t(def.note)}</Note>}
-      <Field label="容錯率" htmlFor="ecLevel" inline={false}>
+      <Field
+        label="容錯率"
+        htmlFor="ecLevel"
+        inline={false}
+        info={<p>{t("L、M、Q、H 代表 QR 碼能修復多少損壞（約 7%、15%、25%、30%）。等級越低，QR 越小、格體越少，但能拿來橋接的容錯預算也越少。")}</p>}
+      >
         <select id="ecLevel" className={inputClass} value={design.level} onChange={(e) => setDesign({ level: e.target.value as Level })}>
           {LEVELS.map(([v, l]) => (
             <option key={v} value={v}>{t(l)}</option>
           ))}
         </select>
       </Field>
-      <Note>{t("等級越低，QR 越小、格體越少，但能拿來橋接的容錯預算也越少。")}</Note>
       {design.mode === "2qr_logo" && (
         <div className="flex flex-col gap-2">
           <Field label="側面的 Logo" htmlFor="logoKind" inline={false}>
@@ -138,17 +153,21 @@ export function ContentPanel() {
             </select>
           </Field>
           {logo.kind === "text" && (
-            <Field label="Logo 文字（1 到 3 個字最清楚）" htmlFor="logoText" inline={false}>
+            <Field label="Logo 文字" htmlFor="logoText" inline={false} info={<p>{t("1 到 3 個字最清楚。")}</p>}>
               <input id="logoText" type="text" className={`${inputClass} font-mono`} value={logo.text} onChange={(e) => setLogo({ text: e.target.value })} />
             </Field>
           )}
-          <label className="flex cursor-pointer items-start gap-2 text-[12.5px] leading-snug">
-            <input type="checkbox" className="mt-0.5 accent-accent" checked={logo.badge} onChange={(e) => setLogo({ badge: e.target.checked })} />
-            {t("徽章樣式：白色圖案在深色底上（建議；全白的列會讓 QR 整列無法覆蓋）")}
-          </label>
+          <Labelled topic="徽章樣式（建議）" info={<p>{t("白色圖案放在深色底上。如果 Logo 有一整列都是白色，那一列的 QR 就沒有格體可以覆蓋，所以建議保持勾選。")}</p>}>
+            <label className="flex cursor-pointer items-start gap-2 text-[12.5px] leading-snug">
+              <input type="checkbox" className="mt-0.5 accent-accent" checked={logo.badge} onChange={(e) => setLogo({ badge: e.target.checked })} />
+              {t("徽章樣式（建議）")}
+            </label>
+          </Labelled>
           <div className="flex items-center gap-3">
             <SideLogoPreview />
-            <Note>{t("側面剪影會長這樣（深色＝有材料）。")}</Note>
+            <Info topic="Logo 預覽">
+              <p>{t("側面剪影會長這樣，深色代表有材料。")}</p>
+            </Info>
           </div>
           <div className="flex items-baseline justify-between gap-2.5">
             <span className="font-mono text-[11.5px] tracking-widest text-muted uppercase">{t("Logo 可犧牲像素")}</span>

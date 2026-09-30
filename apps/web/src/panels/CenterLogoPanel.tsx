@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useStudio } from "@/store";
-import { Field, Note, Panel, inputClass } from "@/components/Panel";
+import { Field, Panel, inputClass } from "@/components/Panel";
+import { Info } from "@/components/Info";
 import { bitsFromImage, centerLogoOverlay, LOGO_FONTS, type CenterLogo, type CenterStyle } from "@/lib/centerLogo";
 import { encodeContent } from "@/lib/content";
 import { qrMatrix, qrVersion } from "@/lib/qr";
@@ -90,7 +91,7 @@ export function CenterLogoPanel() {
         </>
       )}
       {L.kind === "image" && (
-        <Field label="上傳 Logo 圖檔（會轉成黑白格子）" htmlFor="clFile" inline={false}>
+        <Field label="上傳 Logo 圖檔" htmlFor="clFile" inline={false} info={<p>{t("圖片會縮成 32×32 格，再轉成黑白格子。")}</p>}>
           <input id="clFile" type="file" accept="image/*" className="text-xs text-muted" onChange={(e) => upload(e.target.files?.[0])} />
         </Field>
       )}
@@ -130,7 +131,9 @@ export function CenterLogoPanel() {
           </div>
           <div className="flex items-center gap-2.5">
             <Preview L={L} />
-            <Note>{t("預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。")}</Note>
+            <Info topic="Logo 預覽">
+              <p>{t("預覽從上方看到的 QR，藍色是 Logo。Logo 改動的碼字會先從糾錯能力扣掉，橋接只用剩下的能力，所以仍然保證可解碼。")}</p>
+            </Info>
           </div>
         </>
       )}

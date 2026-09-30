@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useStudio } from "@/store";
-import { Note, Panel, PanelIcon, buttonClass, inputClass } from "@/components/Panel";
+import { Labelled, Note, Panel, PanelIcon, buttonClass, inputClass } from "@/components/Panel";
 import { shareLink } from "@/lib/share";
 import { qrSvg } from "@/lib/qr";
 import { saveBlob } from "@/lib/export/formats";
@@ -122,9 +122,11 @@ export function SharePanel() {
       </label>
       {qr ? (
         <div className="flex flex-col items-center gap-2" id="shareQr">
+          <Labelled topic="分享連結的 QR 碼" info={<p>{t("用手機掃描就能打開這個設計。")}</p>}>
+            <span className="text-[12.5px] text-muted">{t("分享連結的 QR 碼")}</span>
+          </Labelled>
           <img src={"data:image/svg+xml;charset=utf-8," + encodeURIComponent(qr.svg)} alt={t("分享連結的 QR 碼")} className="aspect-square w-full max-w-65 rounded bg-white [image-rendering:pixelated]" />
           <div className="flex w-full flex-col gap-1.5">
-            <Note>{t("用手機掃描就能打開這個設計。")}</Note>
             {local && <Note tone="warn">{t("目前的網址只在這台電腦有效，手機掃了打不開；放上網站後再分享。")}</Note>}
             <button type="button" id="shareQrDownload" className={buttonClass} onClick={() => saveBlob(new Blob([qr.svg], { type: "image/svg+xml" }), "tqr-share-qr.svg")}>
               {t("下載 QR 碼")}

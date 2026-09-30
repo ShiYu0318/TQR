@@ -56,7 +56,7 @@ export function sizeNote(): string {
   return (
     t("總尺寸 {w} × {h} × {d} cm。", { w: side, h: side, d: side }) +
     " " +
-    t("剪影要在約 {m} m 外拍攝（視差限制和實際尺寸成正比）。", { m: (farDistanceCm(result.n, moduleMm.sil) / 100).toFixed(0) })
+    t("剪影要在約 {m} m 外拍攝。", { m: (farDistanceCm(result.n, moduleMm.sil) / 100).toFixed(0) })
   );
 }
 

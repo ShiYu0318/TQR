@@ -1,6 +1,6 @@
 import { useStudio } from "@/store";
 import { TILE } from "@/lib/tile";
-import { Note, Panel } from "@/components/Panel";
+import { Labelled, Panel } from "@/components/Panel";
 import { useT } from "@/i18n";
 
 // the tile's five codes and the view each is read from (the sides 40° from above)
@@ -16,7 +16,17 @@ export function TileContentPanel() {
   return (
     <Panel id="content" title="內容" side="left">
       <div className="flex flex-col gap-1">
-        <span className="text-[12.5px] text-muted">{t("各方向的內容（點一下轉到那個方向）")}</span>
+        <Labelled
+          topic="各方向的內容"
+          info={
+            <>
+              <p>{t("點一下轉到那個方向。")}</p>
+              <p>{t("QQR 目前是固定的示範模型，五個連結已經做在模型裡。要換成自己的連結，需要等 QQR 產生器移植到網頁。")}</p>
+            </>
+          }
+        >
+          <span className="text-[12.5px] text-muted">{t("各方向的內容")}</span>
+        </Labelled>
         <div className="flex flex-col gap-0.75" role="group" aria-label={t("各方向的內容")} id="tileViewList">
           {ROWS.map(([k, name, az, el]) => (
             <button
@@ -35,7 +45,6 @@ export function TileContentPanel() {
           ))}
         </div>
       </div>
-      <Note>{t("QQR 目前是固定的示範模型，五個連結已經做在模型裡。要換成自己的連結，需要等 QQR 產生器移植到網頁。")}</Note>
     </Panel>
   );
 }
