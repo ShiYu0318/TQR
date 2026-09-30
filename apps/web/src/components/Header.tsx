@@ -6,7 +6,7 @@ import wordmark from "../../../../assets/brand/wordmark-on-dark.svg";
 
 const MODEL_NOTE = {
   sil: "背光看剪影。上、前、側三個方向各一個碼（或 Logo），對面看到的是鏡像。需要把相機拉遠，數公尺外用長焦掃。",
-  tile: "平放在桌上。從正上方看讀到俯視的碼；站到北、東、南、西任一邊，往下斜 35-50° 讀到那一邊的碼。",
+  tile: "平放在桌上。從正上方看，讀到的是俯視的碼；站到北、東、南、西任一邊，往下斜 35° 到 50° 讀到那一邊的碼。",
 } as const;
 
 export function Header() {

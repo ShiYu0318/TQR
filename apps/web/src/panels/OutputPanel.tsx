@@ -99,7 +99,7 @@ export function OutputPanel() {
             <span className="font-mono text-[13px] tabular-nums">{border}</span>
           </div>
           <input type="range" id="outBorder" aria-label={t("邊框（模組）")} min={0} max={8} value={border} onChange={(e) => setBorder(+e.target.value)} className="w-full accent-accent" />
-          <Note>{t("QR 剪影就是可解碼證明檢查的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。")}</Note>
+          <Note>{t("QR 剪影就是檢查可解碼保證時用的模組圖案，方向和畫面上看到的一樣；邊框是四周留白的模組數（QR 規格建議 4）。")}</Note>
         </div>
       )}
       <button

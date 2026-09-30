@@ -4,11 +4,11 @@ import { Field, Note, Panel, inputClass } from "@/components/Panel";
 import { t, useT } from "@/i18n";
 
 const METHODS: [Method, string, string][] = [
-  ["bridge+strut", "格體橋接＋最少支架", "新方法：用整顆格體把碎塊連起來，只在被定位圖案封住的地方加細支架"],
+  ["bridge+strut", "格體橋接＋最少支架", "用整顆格體把碎塊連起來，只在被定位圖案封住的地方加細支架"],
   ["bridge", "只用格體橋接，不加支架", "主體連成一塊；被封住的小碎塊會分開（數學上無法避免）"],
-  ["strut", "細支架（原方法）", "刪掉多餘格體，全部用沿格線的細支架連起來"],
+  ["strut", "細支架", "刪掉多餘格體，全部用沿格線的細支架連起來"],
   ["free", "不必相連：最少格體", "適合封在透明樹脂或雷射內雕水晶裡"],
-  ["dust", "原始交集", "對照組：所有合法位置都放格體，碎成一千多塊"],
+  ["dust", "原始交集", "對照組：所有合法位置都放格體，會碎成非常多塊"],
 ];
 
 function Slider(props: { label: string; value: number; min: number; max: number; step: number; aria: string; onChange(v: number): void }) {
@@ -34,7 +34,7 @@ export function StructurePanel() {
       {model === "tile" ? (
         <>
           <Note>{t("蛋格是一片平放的板子：每個 QR 模組是一個開口的格子，格子四面牆各帶一個方向的碼，格底帶俯視的碼，所以一片能放五個碼。")}</Note>
-          <Note>{t("從正上方讀俯視的碼；站到北、東、南、西任一邊，往下斜 35-50° 讀那一邊的碼。示範模型的結構不能調整。")}</Note>
+          <Note>{t("從正上方讀俯視的碼；站到北、東、南、西任一邊，往下斜 35° 到 50° 讀那一邊的碼。示範模型的結構不能調整。")}</Note>
         </>
       ) : (
         <>

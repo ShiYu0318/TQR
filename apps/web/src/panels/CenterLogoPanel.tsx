@@ -7,7 +7,7 @@ import { qrMatrix, qrVersion } from "@/lib/qr";
 import { t, useT } from "@/i18n";
 
 const FONT_NAMES: Record<keyof typeof LOGO_FONTS, string> = {
-  sans: "系統預設黑體", jhenghei: "微軟正黑體", pingfang: "蘋方 (Apple)", kai: "標楷體", serif: "系統預設明體", mono: "等寬字體",
+  sans: "系統預設黑體", jhenghei: "微軟正黑體", pingfang: "蘋方（Apple）", kai: "標楷體", serif: "系統預設明體", mono: "等寬字體",
 };
 
 function Slider(props: { label: string; value: number; min: number; max: number; onChange(v: number): void }) {

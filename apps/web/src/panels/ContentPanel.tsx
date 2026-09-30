@@ -138,7 +138,7 @@ export function ContentPanel() {
             </select>
           </Field>
           {logo.kind === "text" && (
-            <Field label="Logo 文字（1-3 個字最清楚）" htmlFor="logoText" inline={false}>
+            <Field label="Logo 文字（1 到 3 個字最清楚）" htmlFor="logoText" inline={false}>
               <input id="logoText" type="text" className={`${inputClass} font-mono`} value={logo.text} onChange={(e) => setLogo({ text: e.target.value })} />
             </Field>
           )}
