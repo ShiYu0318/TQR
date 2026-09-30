@@ -2,7 +2,7 @@
 // (#s1.<base64url JSON>) so it survives hosts that only keep plain #anchors.
 import { useStudio, type Content, type Design, type Look, type Model, type Shape } from "@/store";
 import type { Level, Mode } from "@tqr/tri-core";
-import { CONTENT_TYPES, contentTitle, type Values } from "./content";
+import { CONTENT_TYPES, type Values } from "./content";
 import { LOGO_FONTS, type CenterLogo } from "./centerLogo";
 import type { LogoKind } from "./sideLogo";
 import { BACKDROPS, GRADIENTS, PIECE_PALETTES, THEMES, type Colors } from "@/three/palette";
@@ -147,38 +147,4 @@ export function applySharedHash(): string {
   } catch {
     return "分享連結無法讀取，改用預設值。";
   }
-}
-
-// ---- settings saved in this browser (at most 30, newest first)
-const SAVED_KEY = "tqr.saved";
-export interface Saved {
-  name: string;
-  state: SavedState;
-}
-export function readSaved(): Saved[] {
-  try {
-    const list = JSON.parse(localStorage.getItem(SAVED_KEY) || "[]");
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return [];
-  }
-}
-function writeSaved(list: Saved[]) {
-  try {
-    localStorage.setItem(SAVED_KEY, JSON.stringify(list));
-    return true;
-  } catch {
-    return false;
-  }
-}
-/** save the current settings under "<first view's title> · <time>"; false when the browser refuses */
-export function saveCurrent(): boolean {
-  const s = getState(), c = useStudio.getState().design.content[0];
-  const stamp = new Date().toLocaleString(useStudio.getState().lang === "zh" ? "zh-TW" : "en-US", { hour12: false });
-  return writeSaved([{ name: contentTitle(c.type, c.fields) + " · " + stamp, state: s }, ...readSaved()].slice(0, 30));
-}
-export function deleteSaved(i: number) {
-  const list = readSaved();
-  list.splice(i, 1);
-  writeSaved(list);
 }

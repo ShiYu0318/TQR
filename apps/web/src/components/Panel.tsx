@@ -69,3 +69,16 @@ export function Field({ label, htmlFor, children, inline = true }: { label: stri
 /** shared look of text inputs and selects */
 export const inputClass =
   "w-full rounded-md border border-rule bg-panel px-2 py-1.25 font-body text-[13px] text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+/** secondary button in the side panels */
+export const buttonClass =
+  "flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md border border-rule bg-sunk px-2.5 py-1.75 text-[13px] text-ink hover:border-muted disabled:cursor-default disabled:opacity-45 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+/** 16-unit line icon for panel buttons */
+export function PanelIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  );
+}
