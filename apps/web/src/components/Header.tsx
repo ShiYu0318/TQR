@@ -43,27 +43,42 @@ export function Header() {
           </span>
         </span>
       </h1>
-      <div className="grid gap-1.5 max-[900px]:grid-flow-col max-[900px]:justify-start">
-        <Segmented
-          label={t("語言")}
-          className="w-29"
-          value={lang}
-          onChange={setLang}
-          options={[
-            { value: "zh", label: "中文" },
-            { value: "en", label: "EN" },
-          ]}
-        />
-        <Segmented
-          label={t("選擇模型")}
-          className="w-29"
-          value={model}
-          onChange={setModel}
-          options={[
-            { value: "sil", label: "TQR", title: t("TQR：剪影產生器") },
-            { value: "tile", label: "QQR", title: t("QQR：五向蛋格") },
-          ]}
-        />
+      <div className="flex flex-wrap items-start justify-end gap-2 max-[900px]:justify-start">
+        <div className="grid gap-1.5 max-[900px]:grid-flow-col max-[900px]:justify-start">
+          <Segmented
+            label={t("語言")}
+            className="w-29"
+            value={lang}
+            onChange={setLang}
+            options={[
+              { value: "zh", label: "中文" },
+              { value: "en", label: "EN" },
+            ]}
+          />
+          <Segmented
+            label={t("選擇模型")}
+            className="w-29"
+            value={model}
+            onChange={setModel}
+            options={[
+              { value: "sil", label: "TQR", title: t("TQR：剪影產生器") },
+              { value: "tile", label: "QQR", title: t("QQR：五向蛋格") },
+            ]}
+          />
+        </div>
+        <a
+          href="https://github.com/ShiYu0318/TQR"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={t("在 GitHub 開啟原始碼")}
+          title={t("在 GitHub 開啟原始碼")}
+          className="inline-flex min-h-8 flex-none items-center gap-1.5 rounded-md border border-rule bg-sunk px-2.5 py-1 font-mono text-xs text-muted transition-colors hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
+            <path d="M12 .75a11.25 11.25 0 0 0-3.558 21.923c.563.104.768-.244.768-.543 0-.267-.01-.975-.015-1.913-3.13.68-3.79-1.508-3.79-1.508-.512-1.3-1.25-1.646-1.25-1.646-1.023-.7.078-.686.078-.686 1.13.08 1.724 1.16 1.724 1.16 1.005 1.723 2.636 1.225 3.278.937.102-.728.393-1.225.715-1.507-2.499-.284-5.126-1.25-5.126-5.565 0-1.23.44-2.234 1.16-3.022-.116-.285-.503-1.43.11-2.981 0 0 .945-.303 3.094 1.154A10.8 10.8 0 0 1 12 6.224c.956.005 1.919.129 2.817.379 2.148-1.457 3.091-1.154 3.091-1.154.615 1.551.228 2.696.112 2.981.722.788 1.159 1.792 1.159 3.022 0 4.326-2.631 5.278-5.138 5.557.404.35.766 1.042.766 2.1 0 1.516-.014 2.74-.014 3.112 0 .302.203.653.774.542A11.252 11.252 0 0 0 12 .75Z" />
+          </svg>
+          GitHub
+        </a>
       </div>
     </header>
   );
