@@ -1,0 +1,72 @@
+name: Deploy TQR Studio
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - apps/web/**
+      - packages/**
+      - src/js/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/deploy-pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: 22
+          cache: npm
+      - name: Configure Pages
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6
+      - run: npm ci
+      - run: npm test
+      - name: Build Studio
+        run: npm run build:web
+        env:
+          VITE_BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+      - name: Verify published files
+        shell: python
+        run: |
+          from pathlib import Path
+          root = Path("apps/web/dist")
+          assert (root / "index.html").is_file()
+          allowed = {".html", ".js", ".css", ".wasm", ".svg", ".png", ".webmanifest"}
+          for path in root.rglob("*"):
+              assert not path.is_symlink(), f"Unexpected symlink: {path}"
+              if path.is_file():
+                  assert path.suffix in allowed, f"Unexpected published file: {path}"
+                  assert not {"docs", "paper", "experiments"}.intersection(path.relative_to(root).parts), path
+      - name: Upload Studio only
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Studio
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5

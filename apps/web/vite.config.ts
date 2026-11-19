@@ -13,6 +13,8 @@ const src = (p: string) => fileURLToPath(new URL("./src/" + p, import.meta.url))
 export default defineConfig(({ mode }) => {
   const single = mode === "single";
   return {
+    // Pages serves project sites below /<repo>/; local development stays at /.
+    base: single ? "./" : process.env.VITE_BASE_PATH || "/",
     plugins: [
       triCore(),
       react(),
